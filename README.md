@@ -1,0 +1,2 @@
+# Mewps
+A hobby robot project, powered by Raspberry Pi and Arduino. It is currently being worked on by 3 of my friends and me, and the plan is to make it mobile on wheels and environment aware using various sensors including a camera, a distance sensor, an accelerometer and microphones.
