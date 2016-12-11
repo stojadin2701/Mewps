@@ -22,6 +22,13 @@ class TestTask: public Task
 
 public:
 
+	void on_interrupt() override
+	{
+		cout << "interrupted!" << endl;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	}
+
 	void execute() override
 	{
 		while (counter <= 3)

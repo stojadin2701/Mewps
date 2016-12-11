@@ -8,6 +8,7 @@ CPP_SRCS += \
 ../src/Motor.cpp \
 ../src/Task.cpp \
 ../src/TaskExecuter.cpp \
+../src/Vision.cpp \
 ../src/main.cpp 
 
 OBJS += \
@@ -15,6 +16,7 @@ OBJS += \
 ./src/Motor.o \
 ./src/Task.o \
 ./src/TaskExecuter.o \
+./src/Vision.o \
 ./src/main.o 
 
 CPP_DEPS += \
@@ -22,6 +24,7 @@ CPP_DEPS += \
 ./src/Motor.d \
 ./src/Task.d \
 ./src/TaskExecuter.d \
+./src/Vision.d \
 ./src/main.d 
 
 

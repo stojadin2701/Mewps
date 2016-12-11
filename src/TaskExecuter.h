@@ -17,14 +17,14 @@ using std::stack;
 #include <thread>
 using std::thread;
 
+#include <atomic>
+using std::atomic;
+
 #include <mutex>
 using std::mutex;
 
 #include <condition_variable>
 using std::condition_variable;
-
-#include <atomic>
-using std::atomic;
 
 #include "Task.h"
 
@@ -47,17 +47,17 @@ public:
 	static void stop();
 
 	/*
+	 * Removes all queued and interrupted tasks. (Does not stop the task currently being executed, if any.)
+	 */
+	static void clear();
+
+	/*
 	 * After starting the TaskExecuter, it is in the running state.
-	 * While in the running state, the executer can either be active or idle.
+	 * While in the running state, it can either be executing or idle.
 	 * Idle means that it is running, but that there's no tasks to execute.
 	 */
 	static bool is_running() { return running; }
-	static bool is_idle() { return idle; }
-
-	/*
-	 * Removes all queued tasks. (Does not stop the task currently being executed, if any.)
-	 */
-	static void clear();
+	static bool is_executing() { return executing; }
 
 	struct QueuedTask
 	{
@@ -83,24 +83,28 @@ public:
 
 private:
 
-	static void perform_task();
-
 	static void execute_tasks();
 	static thread executer_thread;
 
-	static priority_queue<QueuedTask> task_pool;
-
-	static stack<QueuedTask> interrupted_tasks;
+	static void interrupt_current_task();
+	static bool wait_on_interrupt_end();
+	static mutex interrupt_mutex;
+	static thread* interrupt_thread;
 
 	static QueuedTask current_task;
+
+	static priority_queue<QueuedTask> task_pool;
+	static stack<QueuedTask> interrupted_tasks;
 
 	static mutex operation_mutex;
 
 	static atomic<bool> running;
 	static condition_variable running_condition;
 
-	static atomic<bool> idle;
-	static condition_variable idle_condition;
+	//If executing is true, it means the current_task member contains a valid task.
+	static atomic<bool> executing;
+	static condition_variable executing_condition;
+
 };
 
 #endif /* TASKEXECUTER_H_ */

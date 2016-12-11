@@ -7,6 +7,8 @@
 
 #include "Task.h"
 
+using std::unique_lock;
+
 void Task::wait_for_state(State state)
 {
 	unique_lock<mutex> lock(state_mutex);
@@ -23,6 +25,7 @@ Task::State Task::get_state()
 
 	return state;
 }
+
 
 void Task::set_state(State state)
 {
@@ -42,4 +45,3 @@ void Task::set_state(State state)
 		state_conditions[state].notify_all();
 	}
 }
-

@@ -8,23 +8,6 @@
 #include "TaskExecuter.h"
 
 using std::unique_lock;
-using std::defer_lock;
-
-thread TaskExecuter::executer_thread(TaskExecuter::execute_tasks);
-
-priority_queue<TaskExecuter::QueuedTask> TaskExecuter::task_pool;
-
-stack<TaskExecuter::QueuedTask> TaskExecuter::interrupted_tasks;
-
-TaskExecuter::QueuedTask TaskExecuter::current_task = { nullptr, CHILL };
-
-mutex TaskExecuter::operation_mutex;
-
-atomic<bool> TaskExecuter::running(false);
-condition_variable TaskExecuter::running_condition;
-
-atomic<bool> TaskExecuter::idle(false);
-condition_variable TaskExecuter::idle_condition;
 
 void TaskExecuter::start()
 {
@@ -33,7 +16,6 @@ void TaskExecuter::start()
 	if (!running)
 	{
 		running = true;
-		idle = true;
 
 		running_condition.notify_one();
 	}
@@ -47,14 +29,13 @@ void TaskExecuter::stop()
 	{
 		running = false;
 
-		if (idle)
+		if (executing)
 		{
-			idle_condition.notify_one();
-			idle = false;
+			interrupt_current_task();
 		}
 		else
 		{
-			current_task.task->interrupt();
+			executing_condition.notify_one();
 		}
 	}
 }
@@ -71,22 +52,16 @@ void TaskExecuter::enqueue_task(Task* task, Priority priority)
 {
 	unique_lock<mutex> lock(operation_mutex);
 
-	if (running && !idle && (priority > current_task.priority))
+	if (executing && (priority > current_task.priority))
 	{
-		current_task.task->interrupt();
-
-		interrupted_tasks.push(current_task);
-
-		interrupted_tasks.push( { task, priority } );
-	}
-	else
-	{
-		task_pool.push( { task, priority } );
+		interrupt_current_task();
 	}
 
-	if (idle)
+	task_pool.push( { task, priority } );
+
+	if (!executing)
 	{
-		idle_condition.notify_one();
+		executing_condition.notify_one();
 	}
 }
 
@@ -97,36 +72,14 @@ const TaskExecuter::QueuedTask& TaskExecuter::get_current_task()
 	return current_task;
 }
 
-void TaskExecuter::perform_task()
-{
-	current_task.task->set_state(Task::State::RUNNING);
-
-	current_task.task->execute();
-
-	idle = true;
-
-	if (current_task.task->interrupted)
-	{
-		current_task.task->interrupted = false;
-
-		current_task.task->set_state(Task::State::INTERRUPTED);
-	}
-	else
-	{
-		current_task.task->set_state(Task::State::ENDED);
-	}
-}
-
 void TaskExecuter::execute_tasks()
 {
 	executer_thread.detach();
 
-	unique_lock<mutex> lock(operation_mutex, defer_lock);
+	unique_lock<mutex> lock(operation_mutex);
 
 	for(;;)
 	{
-		lock.lock();
-
 		if (!running)
 		{
 			running_condition.wait(lock);
@@ -145,22 +98,14 @@ void TaskExecuter::execute_tasks()
 				task_pool.pop();
 			}
 
-			idle = false;
-
-			lock.unlock();
-
-			perform_task();
+			executing = true;
 		}
 		else if (!interrupted_tasks.empty())
 		{
 			current_task = interrupted_tasks.top();
 			interrupted_tasks.pop();
 
-			idle = false;
-
-			lock.unlock();
-
-			perform_task();
+			executing = true;
 		}
 
 		else if(!task_pool.empty())
@@ -168,17 +113,85 @@ void TaskExecuter::execute_tasks()
 			current_task = task_pool.top();
 			task_pool.pop();
 
-			idle = false;
+			executing = true;
+		}
 
+		if (executing)
+		{
 			lock.unlock();
 
-			perform_task();
+			current_task.task->set_state(Task::State::RUNNING);
+
+			current_task.task->execute();
+
+			executing = false;
+
+			if (wait_on_interrupt_end())
+			{
+				interrupted_tasks.push(current_task);
+
+				current_task.task->set_state(Task::State::INTERRUPTED);
+			}
+			else
+			{
+				current_task.task->set_state(Task::State::ENDED);
+			}
+
+			lock.lock();
 		}
 		else
 		{
-			idle_condition.wait(lock);
-
-			lock.unlock();
+			executing_condition.wait(lock);
 		}
 	}
 }
+
+thread TaskExecuter::executer_thread(TaskExecuter::execute_tasks);
+
+void TaskExecuter::interrupt_current_task()
+{
+	unique_lock<mutex> lock(interrupt_mutex);
+
+	if (!current_task.task->interrupted)
+	{
+		current_task.task->interrupted = true;
+
+		interrupt_thread = new thread(Task::on_interrupt_wrapper, current_task.task);
+	}
+}
+
+bool TaskExecuter::wait_on_interrupt_end()
+{
+	unique_lock<mutex> lock(interrupt_mutex);
+
+	if (current_task.task->interrupted)
+	{
+		interrupt_thread->join();
+
+		delete interrupt_thread;
+
+		current_task.task->interrupted = false;
+
+		return true;
+	}
+
+	return false;
+}
+
+mutex TaskExecuter::interrupt_mutex;
+thread* TaskExecuter::interrupt_thread;
+
+TaskExecuter::QueuedTask TaskExecuter::current_task = { nullptr, CHILL };
+
+priority_queue<TaskExecuter::QueuedTask> TaskExecuter::task_pool;
+
+stack<TaskExecuter::QueuedTask> TaskExecuter::interrupted_tasks;
+
+mutex TaskExecuter::operation_mutex;
+
+atomic<bool> TaskExecuter::running(false);
+condition_variable TaskExecuter::running_condition;
+
+atomic<bool> TaskExecuter::executing(false);
+condition_variable TaskExecuter::executing_condition;
+
