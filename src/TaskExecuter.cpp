@@ -69,6 +69,11 @@ const TaskExecuter::QueuedTask& TaskExecuter::get_current_task()
 {
 	unique_lock<mutex> lock(operation_mutex);
 
+	if (!executing)
+	{
+		throw InvalidTaskError();
+	}
+
 	return current_task;
 }
 
@@ -124,6 +129,11 @@ void TaskExecuter::execute_tasks()
 
 			current_task.task->execute();
 
+			/*
+			 * executing must be set to false before wait_on_interrupt_end() is called
+			 * to prevent interrupts after wait_on_interrupt_end() which would cause
+			 * interrupts that aren't waited for to end.
+			 */
 			executing = false;
 
 			if (wait_on_interrupt_end())

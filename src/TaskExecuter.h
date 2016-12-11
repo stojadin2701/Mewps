@@ -28,6 +28,8 @@ using std::condition_variable;
 
 #include "Task.h"
 
+#include "InvalidTaskError.h"
+
 /*
  * TaskExecuter executes given tasks one at a time based on their priority.
  */
@@ -54,7 +56,7 @@ public:
 	/*
 	 * After starting the TaskExecuter, it is in the running state.
 	 * While in the running state, it can either be executing or idle.
-	 * Idle means that it is running, but that there's no tasks to execute.
+	 * Executing means a task has been acquired and is being actively executed.
 	 */
 	static bool is_running() { return running; }
 	static bool is_executing() { return executing; }
@@ -79,6 +81,11 @@ public:
 	 */
 	static void enqueue_task(Task* task, Priority priority);
 
+	/*
+	 * Returns the task currently being executed.
+	 * The return task is only valid if executing is true,
+	 * and will throw an InvalidTaskError if called otherwise.
+	 */
 	static const QueuedTask& get_current_task();
 
 private:

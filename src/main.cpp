@@ -27,13 +27,40 @@ int main()
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
+	try
+	{
+		TaskExecuter::get_current_task();
+	}
+	catch(runtime_error& e)
+	{
+		cout << "expected error 1: " << e.what() << endl;
+	}
+
 	TaskExecuter::enqueue_task(test, TaskExecuter::Priority::NORMAL);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
+	try
+	{
+		TaskExecuter::get_current_task();
+	}
+	catch(runtime_error& e)
+	{
+		cout << "unexpected error 1: " << e.what() << endl;
+	}
+
 	TaskExecuter::enqueue_task(test2, TaskExecuter::Priority::HIGH);
 
 	test->wait_for_state(Task::State::ENDED);
+
+	try
+	{
+		TaskExecuter::get_current_task();
+	}
+	catch(runtime_error& e)
+	{
+		cout << "expected error 2: " << e.what() << endl;
+	}
 
 	cout << "meow: " << endl;
 	int i;
