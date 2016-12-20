@@ -23,6 +23,7 @@ using std::condition_variable;
  */
 class Task
 {
+
 public:
 
 	/*
