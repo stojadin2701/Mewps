@@ -39,7 +39,10 @@ public:
 
 	State get_state();
 
-	virtual ~Task() {}
+	virtual ~Task() = default;
+
+	Task(const Task&) = default; Task& operator=(const Task&) = default;
+	Task(Task&&) = default; Task& operator=(Task&&) = default;
 
 protected:
 
