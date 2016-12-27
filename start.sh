@@ -5,12 +5,13 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-git pull
+./update.sh
 
-cd Microcontroller
-make clean && make && make up
-cd ..
+if [[ $1 == "--debug" ]]
+then
+	cd Debug
+else
+	cd Release
+fi
 
-cd Release
-make clean && make
 #./Mewps
