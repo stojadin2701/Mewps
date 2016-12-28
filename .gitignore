@@ -3,5 +3,3 @@ Debug/Mewps
 Debug/src/*.o
 Release/Mewps
 Release/src/*.o
-/Release/
-/Debug/
