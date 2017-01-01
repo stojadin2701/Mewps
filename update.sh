@@ -2,6 +2,8 @@
 
 echo "Checking for update..."
 
+rm -f $0.running
+
 mv $0 $0.running
 cp $0.running $0
 

@@ -9,4 +9,4 @@ else
 	cd Release
 fi
 
-#./Mewps
+./Mewps

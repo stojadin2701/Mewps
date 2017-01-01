@@ -5,69 +5,17 @@
  *      Author: schutzekatze
  */
 
-#include "TestTask.h"
-#include "TestTask2.h"
-
-#include <thread>
-#include <chrono>
-
-#include <iostream>
-using std::cout;
-using std::cin;
-using std::endl;
-
-#include "TaskExecuter.h"
+#include "initialization.h"
 
 int main()
 {
-	Task* test = new TestTask();
-	Task* test2 = new TestTask2();
+	initialize();
 
-	TaskExecuter::start();
+	/*
+	 * :D
+	 */
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-	try
-	{
-		TaskExecuter::get_current_task();
-	}
-	catch(runtime_error& e)
-	{
-		cout << "expected error 1: " << e.what() << endl;
-	}
-
-	TaskExecuter::enqueue_task(test, TaskExecuter::Priority::NORMAL);
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-	try
-	{
-		TaskExecuter::get_current_task();
-	}
-	catch(runtime_error& e)
-	{
-		cout << "unexpected error 1: " << e.what() << endl;
-	}
-
-	TaskExecuter::enqueue_task(test2, TaskExecuter::Priority::HIGH);
-
-	test->wait_for_state(Task::State::ENDED);
-
-	try
-	{
-		TaskExecuter::get_current_task();
-	}
-	catch(runtime_error& e)
-	{
-		cout << "expected error 2: " << e.what() << endl;
-	}
-
-	cout << "meow: " << endl;
-	int i;
-	cin >> i;
-
-	delete test;
-	delete test2;
+	finalize();
 
 	return 0;
 }
