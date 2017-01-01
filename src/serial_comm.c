@@ -70,7 +70,7 @@ void serial_comm_initialize()
 
 	options.c_oflag &= ~OPOST; // Enable raw output
 
-    options.c_cc[VMIN] = 2;
+	options.c_cc[VMIN] = 2;
 	options.c_cc[VTIME] = 0;
 
 	tcsetattr(tty, TCSANOW, &options);
