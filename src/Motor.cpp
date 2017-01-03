@@ -7,10 +7,14 @@
 
 #include "Motor.h"
 
-Motor Motor::LEFT_MOTOR;
-Motor Motor::RIGHT_MOTOR;
+#include "serial_comm.h"
 
-void Motor::set_power(float power)
+Motor Motor::LEFT_MOTOR(0);
+Motor Motor::RIGHT_MOTOR(1);
+
+void Motor::set_power(short power)
 {
+	this->power = power;
 
+	issue_motor_command(id, power);
 }

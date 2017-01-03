@@ -8,6 +8,17 @@
 #ifndef SERIAL_COMM_H_
 #define SERIAL_COMM_H_
 
+/*
+ * The communication protocol between the main computer and the microcontroller.
+ *
+ * The mode used is 8N1, 8 bit character size, no parity and 1 stop bit.
+ * All messages are fixed size of 16 bits.
+ * Both sides of the communication should include this header, and implement
+ * the initialize, finalize, send and receive functions specific to their platform.
+ */
+
+const int BAUD_RATE = 9600;
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -24,8 +35,6 @@ int16_t serial_comm_receive();
 #ifdef __cplusplus
 }
 #endif
-
-const int BAUD_RATE = 9600;
 
 // Unique preambles to identify message type
 const int16_t MICROPHONE_REQUEST = 0;

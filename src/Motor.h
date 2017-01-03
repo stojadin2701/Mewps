@@ -15,8 +15,16 @@ public:
 
 	static Motor LEFT_MOTOR, RIGHT_MOTOR;
 
-	//Sets the power given to the motor, from -1.0 to 1.0 (0% - 100%, negative means reverse)
-	void set_power(float power);
+	//Sets the power given to the motor, from -255 to 255 (0 - 100%, negative means reverse)
+	void set_power(short power);
+	short get_power() const { return power; }
+
+private:
+
+	Motor(char id): id(id) {}
+
+	char id;
+	short power = 0;
 
 };
 
