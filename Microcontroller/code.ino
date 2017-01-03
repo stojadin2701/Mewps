@@ -1,6 +1,6 @@
 #include "../src/serial_comm.h"
 
-const int MOTOR_PINS[] = { 5, 6, 7, 8 };
+const unsigned MOTOR_PINS[] = { 5, 6, 7, 8 };
 
 void serial_comm_initialize()
 {
@@ -39,7 +39,7 @@ inline void read_microphone_data(int16_t *intensity1, int16_t *intensity2, int16
 	*intensity3 = 0;
 }
 
-inine void set_motor_power(int16_t motor, int16_t power)
+inline void set_motor_power(int16_t motor, int16_t power)
 {
 	if (power < -255 || power > 255) return;
 	if (motor < 0 || motor > 1) return;
@@ -67,7 +67,7 @@ inline void read_distance(int16_t *distance)
 
 void setup()
 {
-	int pin;
+	unsigned pin;
 	for(pin = 0; pin < sizeof(MOTOR_PINS) / sizeof(int); pin++)
 	{
 		pinMode(pin, OUTPUT);
