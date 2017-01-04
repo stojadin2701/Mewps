@@ -9,6 +9,7 @@ CPP_SRCS += \
 ../src/Task.cpp \
 ../src/TaskExecuter.cpp \
 ../src/Vision.cpp \
+../src/comm_protocol_threadsafe.cpp \
 ../src/initialization.cpp \
 ../src/main.cpp 
 
@@ -21,6 +22,7 @@ OBJS += \
 ./src/Task.o \
 ./src/TaskExecuter.o \
 ./src/Vision.o \
+./src/comm_protocol_threadsafe.o \
 ./src/initialization.o \
 ./src/main.o \
 ./src/serial_comm.o 
@@ -31,6 +33,7 @@ CPP_DEPS += \
 ./src/Task.d \
 ./src/TaskExecuter.d \
 ./src/Vision.d \
+./src/comm_protocol_threadsafe.d \
 ./src/initialization.d \
 ./src/main.d 
 

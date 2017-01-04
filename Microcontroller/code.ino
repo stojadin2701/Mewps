@@ -1,4 +1,5 @@
 #include "../src/serial_comm.h"
+#include "../src/comm_protocol.h"
 
 const unsigned MOTOR_PINS[] = { 5, 6, 7, 8 };
 

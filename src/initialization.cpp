@@ -18,5 +18,3 @@ void finalize()
 {
 	serial_comm_finalize();
 }
-
-
