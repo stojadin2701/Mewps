@@ -90,6 +90,8 @@ public:
 
 private:
 
+	TaskExecuter() = delete;
+
 	static void execute_tasks();
 	static thread executer_thread;
 

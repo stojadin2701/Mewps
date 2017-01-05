@@ -38,18 +38,18 @@ inline void send_microphone_data_ts(const int16_t intensity1, const int16_t inte
 	send_microphone_data(intensity1, intensity2, intensity3);
 }
 
-inline void issue_motor_command_ts(const int16_t motor, const int16_t power)
+inline void issue_motors_command_ts(const int16_t power1, const int16_t power2)
 {
 	unique_lock<mutex> lock(threadsafety);
 
-	issue_motor_command(motor, power);
+	issue_motors_command(power1, power2);
 }
 
-inline void receive_motor_command_ts(int16_t* motor, int16_t* power)
+inline void receive_motors_command_ts(int16_t* power1, int16_t* power2)
 {
 	unique_lock<mutex> lock(threadsafety);
 
-	receive_motor_command(motor, power);
+	receive_motors_command(power1, power2);
 }
 
 inline void request_distance_ts(int16_t* distance)

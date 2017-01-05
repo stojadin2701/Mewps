@@ -5,7 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/EnvironmentMap.cpp \
-../src/Motor.cpp \
+../src/Motors.cpp \
 ../src/Task.cpp \
 ../src/TaskExecuter.cpp \
 ../src/Vision.cpp \
@@ -18,7 +18,7 @@ C_SRCS += \
 
 OBJS += \
 ./src/EnvironmentMap.o \
-./src/Motor.o \
+./src/Motors.o \
 ./src/Task.o \
 ./src/TaskExecuter.o \
 ./src/Vision.o \
@@ -29,7 +29,7 @@ OBJS += \
 
 CPP_DEPS += \
 ./src/EnvironmentMap.d \
-./src/Motor.d \
+./src/Motors.d \
 ./src/Task.d \
 ./src/TaskExecuter.d \
 ./src/Vision.d \

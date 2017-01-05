@@ -40,25 +40,30 @@ inline void read_microphone_data(int16_t *intensity1, int16_t *intensity2, int16
 	*intensity3 = 0;
 }
 
-inline void set_motor_power(int16_t motor, int16_t power)
+inline void set_motors_power(int16_t power1, int16_t power2)
 {
-	if (power < -255 || power > 255) return;
-	if (motor < 0 || motor > 1) return;
-
-	int pin1 = MOTOR_PINS[motor * 2];
-	int pin2 = MOTOR_PINS[motor * 2 + 1];
+	if (power1 < -255 || power1 > 255) return;
+	if (power2 < -255 || power2 > 255) return;
 	
-	if (power < 0)
+	int16_t powers[] = { power1, 0, power2, 0 };
+	
+	if (power1 < 0)
 	{
-		int temp = pin1;
-		pin1 = pin2;
-		pin2 = temp;
-		
-		power *= -1;
+		powers[0] = 0;
+		powers[1] = -power1;
 	}
 	
-	analogWrite(pin1, power);
-	analogWrite(pin2, 0);
+	if (power2 < 0)
+	{
+		powers[2] = 0;
+		powers[3] = -power2;
+	}
+	
+	unsigned i;
+	for(i = 0; i < sizeof(MOTOR_PINS) / sizeof(unsigned); i++)
+	{
+		analogWrite(MOTOR_PINS[i], powers[i]);
+	}
 }
 
 inline void read_distance(int16_t *distance)
@@ -93,13 +98,13 @@ void loop()
 			
 			break;		
 		}		
-		case MOTOR_COMMAND:
+		case MOTORS_COMMAND:
 		{
-			int16_t motor;
-			int16_t power;
+			int16_t power1;
+			int16_t power2;
 		
-			receive_motor_command(&motor, &power);
-			set_motor_power(motor, power);
+			receive_motors_command(&power1, &power2);
+			set_motors_power(power1, power2);
 			
 			break;
 		}

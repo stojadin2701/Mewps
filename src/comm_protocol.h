@@ -12,7 +12,7 @@
 
 // Unique preambles to identify message type
 const int16_t MICROPHONE_REQUEST = 0;
-const int16_t MOTOR_COMMAND = 1;
+const int16_t MOTORS_COMMAND = 1;
 const int16_t DISTANCE_REQUEST = 2;
 
 // Protocol wrappers
@@ -36,17 +36,17 @@ inline void send_microphone_data(const int16_t intensity1, const int16_t intensi
 	serial_comm_send(intensity3);
 }
 
-inline void issue_motor_command(const int16_t motor, const int16_t power)
+inline void issue_motors_command(const int16_t power1, const int16_t power2)
 {
-	serial_comm_send(MOTOR_COMMAND);
-	serial_comm_send(motor);
-	serial_comm_send(power);
+	serial_comm_send(MOTORS_COMMAND);
+	serial_comm_send(power1);
+	serial_comm_send(power2);
 }
 
-inline void receive_motor_command(int16_t* motor, int16_t* power)
+inline void receive_motors_command(int16_t* power1, int16_t* power2)
 {
-	*motor = serial_comm_receive();
-	*power = serial_comm_receive();
+	*power1 = serial_comm_receive();
+	*power2 = serial_comm_receive();
 }
 
 inline void request_distance(int16_t* distance)
