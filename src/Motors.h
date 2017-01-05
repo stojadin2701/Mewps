@@ -13,15 +13,20 @@ class Motors
 
 public:
 
-	static void set_powers(short power1, short power2);
-	static void get_powers(short *power1, short *power2);
+	/*
+	 * Set and get powers given to the robot motors.
+	 * The values range from -255 to 255, with -255 meaning
+	 * going reverse at max speed, and 255 going forward at max speed.
+	 */
+	static void set_powers(short power_left, short power_right);
+	static void get_powers(short *power_left, short *power_right);
 
 private:
 
 	Motors() = delete;
 
-	static short power1;
-	static short power2;
+	static short power_left;
+	static short power_right;
 
 };
 

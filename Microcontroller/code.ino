@@ -1,6 +1,7 @@
 #include "../src/serial_comm.h"
 #include "../src/comm_protocol.h"
 
+// Left and right motor pins respectively
 const unsigned MOTOR_PINS[] = { 5, 6, 7, 8 };
 
 void serial_comm_initialize()
@@ -40,23 +41,23 @@ inline void read_microphone_data(int16_t *intensity1, int16_t *intensity2, int16
 	*intensity3 = 0;
 }
 
-inline void set_motors_power(int16_t power1, int16_t power2)
+inline void set_motors_power(int16_t power_left, int16_t power_right)
 {
-	if (power1 < -255 || power1 > 255) return;
-	if (power2 < -255 || power2 > 255) return;
+	if (power_left < -255 || power_left > 255) return;
+	if (power_right < -255 || power_right > 255) return;
 	
-	int16_t powers[] = { power1, 0, power2, 0 };
+	int16_t powers[] = { power_left, 0, power_right, 0 };
 	
-	if (power1 < 0)
+	if (power_left < 0)
 	{
 		powers[0] = 0;
-		powers[1] = -power1;
+		powers[1] = -power_left;
 	}
 	
-	if (power2 < 0)
+	if (power_right < 0)
 	{
 		powers[2] = 0;
-		powers[3] = -power2;
+		powers[3] = -power_right;
 	}
 	
 	unsigned i;
@@ -100,11 +101,11 @@ void loop()
 		}		
 		case MOTORS_COMMAND:
 		{
-			int16_t power1;
-			int16_t power2;
+			int16_t power_left;
+			int16_t power_right;
 		
-			receive_motors_command(&power1, &power2);
-			set_motors_power(power1, power2);
+			receive_motors_command(&power_left, &power_right);
+			set_motors_power(power_left, power_right);
 			
 			break;
 		}

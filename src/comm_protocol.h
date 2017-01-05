@@ -36,17 +36,17 @@ inline void send_microphone_data(const int16_t intensity1, const int16_t intensi
 	serial_comm_send(intensity3);
 }
 
-inline void issue_motors_command(const int16_t power1, const int16_t power2)
+inline void issue_motors_command(const int16_t power_left, const int16_t power_right)
 {
 	serial_comm_send(MOTORS_COMMAND);
-	serial_comm_send(power1);
-	serial_comm_send(power2);
+	serial_comm_send(power_left);
+	serial_comm_send(power_right);
 }
 
-inline void receive_motors_command(int16_t* power1, int16_t* power2)
+inline void receive_motors_command(int16_t* power_left, int16_t* power_right)
 {
-	*power1 = serial_comm_receive();
-	*power2 = serial_comm_receive();
+	*power_left = serial_comm_receive();
+	*power_right = serial_comm_receive();
 }
 
 inline void request_distance(int16_t* distance)

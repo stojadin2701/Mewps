@@ -9,16 +9,16 @@
 
 #include "comm_protocol_threadsafe.h"
 
-short Motors::power1 = 0;
-short Motors::power2 = 0;
+short Motors::power_left = 0;
+short Motors::power_right = 0;
 
-void Motors::set_powers(short power1, short power2)
+void Motors::set_powers(short power_left, short power_right)
 {
-	issue_motors_command_ts(power1, power2);
+	issue_motors_command_ts(power_left, power_right);
 }
 
-void Motors::get_powers(short *power1, short *power2)
+void Motors::get_powers(short *power_left, short *power_right)
 {
-	*power1 = Motors::power1;
-	*power2 = Motors::power2;
+	*power_left = Motors::power_left;
+	*power_right = Motors::power_right;
 }
