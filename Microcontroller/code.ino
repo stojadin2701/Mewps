@@ -19,7 +19,7 @@ void serial_comm_finalize()
 void serial_comm_send(const int16_t msg)
 {
 	int16_t network_msg = ((msg << 8) & 0xff00) | ((msg >> 8) & 0x00ff);
-	Serial.write((const char*)&network_msg, sizeof(network_msg));
+	Serial.write((const uint8_t*)&network_msg, sizeof(network_msg));
 }
 
 int16_t serial_comm_receive()
@@ -78,9 +78,10 @@ void setup()
 {
 	unsigned pin;
 
-	for(pin = 0; pin < sizeof(ENABLE_PINS) / sizeof(unsigned; pin++)
+	for(pin = 0; pin < sizeof(ENABLE_PINS) / sizeof(unsigned); pin++)
 	{
 		pinMode(ENABLE_PINS[pin], OUTPUT);
+		digitalWrite(ENABLE_PINS[pin], HIGH);
 	}
 
 	for(pin = 0; pin < sizeof(MOTOR_PINS) / sizeof(unsigned); pin++)
