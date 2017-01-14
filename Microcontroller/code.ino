@@ -1,8 +1,10 @@
 #include "../src/serial_comm.h"
 #include "../src/comm_protocol.h"
 
+// Motor enable pins
+const unsigned ENABLE_PINS[] = { 4, 8 };
 // Left and right motor pins respectively
-const unsigned MOTOR_PINS[] = { 5, 6, 7, 8 };
+const unsigned MOTOR_PINS[] = { 5, 6, 9, 10 };
 
 void serial_comm_initialize()
 {
@@ -75,9 +77,15 @@ inline void read_distance(int16_t *distance)
 void setup()
 {
 	unsigned pin;
-	for(pin = 0; pin < sizeof(MOTOR_PINS) / sizeof(int); pin++)
+
+	for(pin = 0; pin < sizeof(ENABLE_PINS) / sizeof(unsigned; pin++)
 	{
-		pinMode(pin, OUTPUT);
+		pinMode(ENABLE_PINS[pin], OUTPUT);
+	}
+
+	for(pin = 0; pin < sizeof(MOTOR_PINS) / sizeof(unsigned); pin++)
+	{
+		pinMode(MOTOR_PINS[pin], OUTPUT);
 	}
 
 	serial_comm_initialize();
