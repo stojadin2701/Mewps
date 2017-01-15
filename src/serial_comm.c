@@ -63,7 +63,7 @@ void serial_comm_initialize()
 	// options.c_iflag |= (INPCK | ISTRIP); //Enable parity check and strip
 
 	// Disable hardware and software flow control respectively
-	//options.c_cflag &= ~RTSCTS;
+	options.c_cflag &= ~CRTSCTS;
 	options.c_iflag &= ~(IXON | IXOFF | IXANY);
 
 	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); // Enable raw input
