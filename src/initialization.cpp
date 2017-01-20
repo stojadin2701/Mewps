@@ -1,8 +1,7 @@
 /*
  * initialization.cpp
  *
- *  Created on: Jan 1, 2017
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #include "initialization.h"
@@ -11,10 +10,10 @@
 
 void initialize()
 {
-	serial_comm_initialize();
+    serial_comm_initialize();
 }
 
 void finalize()
 {
-	serial_comm_finalize();
+    serial_comm_finalize();
 }

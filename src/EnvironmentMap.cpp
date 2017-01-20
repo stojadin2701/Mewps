@@ -1,9 +1,7 @@
 /*
  * EnvironmentMap.cpp
  *
- *  Created on: Oct 3, 2016
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #include "EnvironmentMap.h"
-

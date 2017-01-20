@@ -1,32 +1,33 @@
 /*
  * Motors.h
  *
- *  Created on: Jan 5, 2017
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #ifndef MOTORS_H_
 #define MOTORS_H_
+
+#include <cstdint>
 
 class Motors
 {
 
 public:
 
-	/*
-	 * Set and get powers given to the robot motors.
-	 * The values range from -255 to 255, with -255 meaning
-	 * going reverse at max speed, and 255 going forward at max speed.
-	 */
-	static void set_powers(short power_left, short power_right);
-	static void get_powers(short *power_left, short *power_right);
+    /*
+     * Set and get powers given to the robot motors.
+     * The values range from -255 to 255, with -255 meaning
+     * going reverse at max speed, and 255 going forward at max speed.
+     */
+    static void set_powers(int16_t power_left, int16_t power_right);
+    static void get_powers(int16_t *power_left, int16_t *power_right);
 
 private:
 
-	Motors() = delete;
+    Motors() = delete;
 
-	static short power_left;
-	static short power_right;
+    static int16_t power_left;
+    static int16_t power_right;
 
 };
 

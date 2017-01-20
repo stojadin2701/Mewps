@@ -1,8 +1,7 @@
 /*
  * Vision.h
  *
- *  Created on: Nov 29, 2016
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #ifndef VISION_H_
@@ -13,8 +12,8 @@ class Vision
 
 public:
 
-	// Multiple readers/writers problem
-	static const unsigned char* get_frame();
+    // Multiple readers/writers problem
+    static const unsigned char* get_frame();
 
 };
 

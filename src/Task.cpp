@@ -1,8 +1,7 @@
 /*
  * Task.cpp
  *
- *  Created on: Nov 28, 2016
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #include "Task.h"
@@ -11,37 +10,37 @@ using std::unique_lock;
 
 void Task::wait_for_state(State state)
 {
-	unique_lock<mutex> lock(state_mutex);
+    unique_lock<mutex> lock(state_mutex);
 
-	if (this->state != state)
-	{
-		state_conditions[state].wait(lock);
-	}
+    if (this->state != state)
+    {
+        state_conditions[state].wait(lock);
+    }
 }
 
 Task::State Task::get_state()
 {
-	unique_lock<mutex> lock(state_mutex);
+    unique_lock<mutex> lock(state_mutex);
 
-	return state;
+    return state;
 }
 
 
 void Task::set_state(State state)
 {
-	unique_lock<mutex> lock(state_mutex);
+    unique_lock<mutex> lock(state_mutex);
 
-	this->state = state;
+    this->state = state;
 
-	if (state == State::ENDED)
-	{
-		for(condition_variable& condition : state_conditions)
-		{
-			condition.notify_all();
-		}
-	}
-	else
-	{
-		state_conditions[state].notify_all();
-	}
+    if (state == State::ENDED)
+    {
+	    for (condition_variable& condition : state_conditions)
+	    {
+            condition.notify_all();
+        }
+    }
+    else
+    {
+        state_conditions[state].notify_all();
+    }
 }

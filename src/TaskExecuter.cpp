@@ -1,8 +1,7 @@
 /*
  * TaskExecuter.cpp
  *
- *  Created on: Sep 24, 2016
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #include "TaskExecuter.h"
@@ -11,181 +10,181 @@ using std::unique_lock;
 
 void TaskExecuter::start()
 {
-	unique_lock<mutex> lock(operation_mutex);
+    unique_lock<mutex> lock(operation_mutex);
 
-	if (!running)
-	{
-		running = true;
+    if (!running)
+    {
+        running = true;
 
-		running_condition.notify_one();
-	}
+        running_condition.notify_one();
+    }
 }
 
 void TaskExecuter::stop()
 {
-	unique_lock<mutex> lock(operation_mutex);
+    unique_lock<mutex> lock(operation_mutex);
 
-	if (running)
-	{
-		running = false;
+    if (running)
+    {
+        running = false;
 
-		if (executing)
-		{
-			interrupt_current_task();
-		}
-		else
-		{
-			executing_condition.notify_one();
-		}
-	}
+        if (executing)
+        {
+            interrupt_current_task();
+        }
+        else
+        {
+            executing_condition.notify_one();
+        }
+    }
 }
 
 void TaskExecuter::clear()
 {
-	unique_lock<mutex> lock(operation_mutex);
+    unique_lock<mutex> lock(operation_mutex);
 
-	while (task_pool.size() > 0) task_pool.pop();
-	while (interrupted_tasks.size() > 0) interrupted_tasks.pop();
+    while (task_pool.size() > 0) task_pool.pop();
+    while (interrupted_tasks.size() > 0) interrupted_tasks.pop();
 }
 
 void TaskExecuter::enqueue_task(Task* task, Priority priority)
 {
-	unique_lock<mutex> lock(operation_mutex);
+    unique_lock<mutex> lock(operation_mutex);
 
-	if (executing && (priority > current_task.priority))
-	{
-		interrupt_current_task();
-	}
+    if (executing && (priority > current_task.priority))
+    {
+        interrupt_current_task();
+    }
 
-	task_pool.push( { task, priority } );
+    task_pool.push( { task, priority } );
 
-	if (!executing)
-	{
-		executing_condition.notify_one();
-	}
+    if (!executing)
+    {
+        executing_condition.notify_one();
+    }
 }
 
 const TaskExecuter::QueuedTask& TaskExecuter::get_current_task()
 {
-	unique_lock<mutex> lock(operation_mutex);
+    unique_lock<mutex> lock(operation_mutex);
 
-	if (!executing)
-	{
-		throw InvalidTaskError();
-	}
+    if (!executing)
+    {
+        throw InvalidTaskError();
+    }
 
-	return current_task;
+    return current_task;
 }
 
 void TaskExecuter::execute_tasks()
 {
-	executer_thread.detach();
+    executer_thread.detach();
 
-	unique_lock<mutex> lock(operation_mutex);
+    unique_lock<mutex> lock(operation_mutex);
 
-	for(;;)
-	{
-		if (!running)
-		{
-			running_condition.wait(lock);
-		}
+    for (;;)
+    {
+        if (!running)
+        {
+            running_condition.wait(lock);
+        }
 
-		if (!interrupted_tasks.empty() && !task_pool.empty())
-		{
-			if (interrupted_tasks.top().priority >= task_pool.top().priority)
-			{
-				current_task = interrupted_tasks.top();
-				interrupted_tasks.pop();
-			}
-			else
-			{
-				current_task = task_pool.top();
-				task_pool.pop();
-			}
+        if (!interrupted_tasks.empty() && !task_pool.empty())
+        {
+            if (interrupted_tasks.top().priority >= task_pool.top().priority)
+            {
+                current_task = interrupted_tasks.top();
+                interrupted_tasks.pop();
+            }
+            else
+            {
+                current_task = task_pool.top();
+                task_pool.pop();
+            }
 
-			executing = true;
-		}
-		else if (!interrupted_tasks.empty())
-		{
-			current_task = interrupted_tasks.top();
-			interrupted_tasks.pop();
+            executing = true;
+        }
+        else if (!interrupted_tasks.empty())
+        {
+            current_task = interrupted_tasks.top();
+            interrupted_tasks.pop();
 
-			executing = true;
-		}
+            executing = true;
+        }
 
-		else if(!task_pool.empty())
-		{
-			current_task = task_pool.top();
-			task_pool.pop();
+        else if(!task_pool.empty())
+        {
+            current_task = task_pool.top();
+            task_pool.pop();
 
-			executing = true;
-		}
+            executing = true;
+        }
 
-		if (executing)
-		{
-			lock.unlock();
+        if (executing)
+        {
+            lock.unlock();
 
-			current_task.task->set_state(Task::State::RUNNING);
+            current_task.task->set_state(Task::State::RUNNING);
 
-			current_task.task->execute();
+            current_task.task->execute();
 
-			/*
-			 * executing must be set to false before wait_on_interrupt_end() is called
-			 * to prevent interrupts after wait_on_interrupt_end() which would cause
-			 * interrupts that aren't waited for to end.
-			 */
-			executing = false;
+            /*
+             * executing must be set to false before wait_on_interrupt_end() is called
+             * to prevent interrupts after wait_on_interrupt_end() which would cause
+             * interrupts that aren't waited for to end.
+             */
+            executing = false;
 
-			if (wait_on_interrupt_end())
-			{
-				interrupted_tasks.push(current_task);
+            if (wait_on_interrupt_end())
+            {
+                interrupted_tasks.push(current_task);
 
-				current_task.task->set_state(Task::State::INTERRUPTED);
-			}
-			else
-			{
-				current_task.task->set_state(Task::State::ENDED);
-			}
+                current_task.task->set_state(Task::State::INTERRUPTED);
+            }
+            else
+            {
+                current_task.task->set_state(Task::State::ENDED);
+            }
 
-			lock.lock();
-		}
-		else
-		{
-			executing_condition.wait(lock);
-		}
-	}
+            lock.lock();
+        }
+        else
+        {
+            executing_condition.wait(lock);
+        }
+    }
 }
 
 thread TaskExecuter::executer_thread(TaskExecuter::execute_tasks);
 
 void TaskExecuter::interrupt_current_task()
 {
-	unique_lock<mutex> lock(interrupt_mutex);
+    unique_lock<mutex> lock(interrupt_mutex);
 
-	if (!current_task.task->interrupted)
-	{
-		current_task.task->interrupted = true;
+    if (!current_task.task->interrupted)
+    {
+        current_task.task->interrupted = true;
 
-		interrupt_thread = new thread(Task::on_interrupt_wrapper, current_task.task);
-	}
+        interrupt_thread = new thread(Task::on_interrupt_wrapper, current_task.task);
+    }
 }
 
 bool TaskExecuter::wait_on_interrupt_end()
 {
-	unique_lock<mutex> lock(interrupt_mutex);
+    unique_lock<mutex> lock(interrupt_mutex);
 
-	if (current_task.task->interrupted)
-	{
-		interrupt_thread->join();
+    if (current_task.task->interrupted)
+    {
+        interrupt_thread->join();
 
-		delete interrupt_thread;
+        delete interrupt_thread;
 
-		current_task.task->interrupted = false;
+        current_task.task->interrupted = false;
 
-		return true;
-	}
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 mutex TaskExecuter::interrupt_mutex;

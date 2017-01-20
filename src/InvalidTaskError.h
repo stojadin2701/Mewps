@@ -1,8 +1,7 @@
 /*
  * InvalidTaskError.h
  *
- *  Created on: Dec 11, 2016
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #ifndef INVALIDTASKERROR_H_
@@ -16,7 +15,7 @@ class InvalidTaskError: public runtime_error
 
 public:
 
-	InvalidTaskError(): runtime_error("Invalid task acquired.") {}
+    InvalidTaskError(): runtime_error("Invalid task acquired.") {}
 
 };
 

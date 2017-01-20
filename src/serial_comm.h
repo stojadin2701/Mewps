@@ -1,8 +1,7 @@
 /*
  * serial_comm.h
  *
- *  Created on: Dec 29, 2016
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #ifndef SERIAL_COMM_H_

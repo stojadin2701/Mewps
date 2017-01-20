@@ -1,8 +1,7 @@
 /*
  * TestTask.h
  *
- *  Created on: Oct 3, 2016
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #ifndef TESTTASK_H_
@@ -22,33 +21,31 @@ class TestTask: public Task
 
 public:
 
-	void on_interrupt() override
+    void on_interrupt() override
 	{
-		cout << "interrupted!" << endl;
+        cout << "interrupted!" << endl;
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-	}
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    }
 
-	void execute() override
-	{
-		while (counter <= 3)
-		{
-			if (is_interrupted())
-			{
-				return;
-			}
+    void execute() override {
+        while (counter <= 3)
+        {
+            if (is_interrupted())
+            {
+                return;
+            }
 
-			cout << counter++ << endl;
+            cout << counter++ << endl;
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		}
-	}
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+    }
 
 private:
 
-	int counter = 1;
+    int counter = 1;
 
 };
 
 #endif /* TESTTASK_H_ */
-

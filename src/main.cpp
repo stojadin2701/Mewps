@@ -1,23 +1,22 @@
 /*
  * main.cpp
  *
- *  Created on: Aug 29, 2016
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #include "initialization.h"
 
 int main()
 {
-	initialize();
+    initialize();
 
-	/*
-	 * :D
-	 */
+    /*
+     * :D
+     */
 
-	finalize();
+    finalize();
 
-	return 0;
+    return 0;
 }
 
 

@@ -1,8 +1,7 @@
 /*
  * initialization.h
  *
- *  Created on: Jan 1, 2017
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #ifndef INITIALIZATION_H_

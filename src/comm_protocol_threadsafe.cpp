@@ -1,8 +1,7 @@
 /*
  * comm_protocol_threadsafe.cpp
  *
- *  Created on: Jan 4, 2017
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #include "comm_protocol_threadsafe.h"
