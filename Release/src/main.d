@@ -1,3 +1,3 @@
-src/main.o: ../src/main.cpp ../src/initialization.h
+src/main.o: ../src/main.cpp ../src/system/initialization.h
 
-../src/initialization.h:
+../src/system/initialization.h:

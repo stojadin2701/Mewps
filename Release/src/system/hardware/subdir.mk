@@ -3,21 +3,24 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-CPP_SRCS += \
-../src/main.cpp 
+C_SRCS += \
+../src/system/hardware/battery_reader.c \
+../src/system/hardware/serial_comm.c 
 
 OBJS += \
-./src/main.o 
+./src/system/hardware/battery_reader.o \
+./src/system/hardware/serial_comm.o 
 
-CPP_DEPS += \
-./src/main.d 
+C_DEPS += \
+./src/system/hardware/battery_reader.d \
+./src/system/hardware/serial_comm.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/%.o: ../src/%.cpp
+src/system/hardware/%.o: ../src/system/hardware/%.c
 	@echo 'Building file: $<'
-	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++14 -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	@echo 'Invoking: GCC C Compiler'
+	gcc -std=gnu11 -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

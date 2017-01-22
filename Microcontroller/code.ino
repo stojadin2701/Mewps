@@ -4,8 +4,8 @@
 *  Copyright 2017 Vladimir Nikolić
 */
 
-#include "../src/serial_comm.h"
-#include "../src/comm_protocol.h"
+#include "../src/system/hardware/serial_comm.h"
+#include "../src/system/comm_protocol.h"
 
 // Motor enable pins
 const unsigned ENABLE_PINS[] = { 4, 8 };

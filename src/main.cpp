@@ -4,7 +4,7 @@
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#include "initialization.h"
+#include "system/initialization.h"
 
 int main()
 {
