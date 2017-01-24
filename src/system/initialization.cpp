@@ -6,7 +6,7 @@
 
 #include "initialization.h"
 
-#include "hardware/serial_comm.h"
+#include "peripherals/hardware/serial_comm.h"
 
 void initialize()
 {

@@ -4,26 +4,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/system/EnvironmentMap.cpp \
-../src/system/Task.cpp \
-../src/system/TaskExecuter.cpp \
-../src/system/initialization.cpp 
+../src/system/peripherals/Motors.cpp \
+../src/system/peripherals/PowerSupply.cpp \
+../src/system/peripherals/Vision.cpp \
+../src/system/peripherals/comm_protocol_threadsafe.cpp 
 
 OBJS += \
-./src/system/EnvironmentMap.o \
-./src/system/Task.o \
-./src/system/TaskExecuter.o \
-./src/system/initialization.o 
+./src/system/peripherals/Motors.o \
+./src/system/peripherals/PowerSupply.o \
+./src/system/peripherals/Vision.o \
+./src/system/peripherals/comm_protocol_threadsafe.o 
 
 CPP_DEPS += \
-./src/system/EnvironmentMap.d \
-./src/system/Task.d \
-./src/system/TaskExecuter.d \
-./src/system/initialization.d 
+./src/system/peripherals/Motors.d \
+./src/system/peripherals/PowerSupply.d \
+./src/system/peripherals/Vision.d \
+./src/system/peripherals/comm_protocol_threadsafe.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-src/system/%.o: ../src/system/%.cpp
+src/system/peripherals/%.o: ../src/system/peripherals/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
 	g++ -std=c++14 -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
