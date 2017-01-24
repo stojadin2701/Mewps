@@ -1,13 +1,13 @@
 /*
- * Vision.h
+ * Camera.h
  *
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#ifndef SYSTEM_PERIPHERALS_VISION_H_
-#define SYSTEM_PERIPHERALS_VISION_H_
+#ifndef SYSTEM_PERIPHERALS_CAMERA_H_
+#define SYSTEM_PERIPHERALS_CAMERA_H_
 
-class Vision
+class Camera
 {
 
 public:
@@ -17,4 +17,4 @@ public:
 
 };
 
-#endif /* SYSTEM_PERIPHERALS_VISION_H_ */
+#endif /* SYSTEM_PERIPHERALS_CAMERA_H_ */

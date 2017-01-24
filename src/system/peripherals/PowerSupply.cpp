@@ -1,8 +1,7 @@
 /*
  * PowerSupply.cpp
  *
- *  Created on: Jan 24, 2017
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #include "PowerSupply.h"

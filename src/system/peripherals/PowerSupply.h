@@ -1,8 +1,7 @@
 /*
  * PowerSupply.h
  *
- *  Created on: Jan 24, 2017
- *      Author: schutzekatze
+ *  Copyright 2017 Vladimir Nikolić
  */
 
 #ifndef SYSTEM_PERIPHERALS_POWERSUPPLY_H_
