@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../src/system/peripherals/Accelerometer.cpp \
 ../src/system/peripherals/Camera.cpp \
 ../src/system/peripherals/DistanceSensor.cpp \
 ../src/system/peripherals/Microphones.cpp \
@@ -12,6 +13,7 @@ CPP_SRCS += \
 ../src/system/peripherals/comm_protocol_threadsafe.cpp 
 
 OBJS += \
+./src/system/peripherals/Accelerometer.o \
 ./src/system/peripherals/Camera.o \
 ./src/system/peripherals/DistanceSensor.o \
 ./src/system/peripherals/Microphones.o \
@@ -20,6 +22,7 @@ OBJS += \
 ./src/system/peripherals/comm_protocol_threadsafe.o 
 
 CPP_DEPS += \
+./src/system/peripherals/Accelerometer.d \
 ./src/system/peripherals/Camera.d \
 ./src/system/peripherals/DistanceSensor.d \
 ./src/system/peripherals/Microphones.d \

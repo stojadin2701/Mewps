@@ -14,7 +14,8 @@
 using std::cout;
 using std::endl;
 
-#include "Task.h"
+#include "infrastructure/Task.h"
+using infrastructure::Task;
 
 class TestTask: public Task
 {

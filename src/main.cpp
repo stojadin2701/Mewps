@@ -4,17 +4,17 @@
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#include "system/initialization.h"
+#include "infrastructure/initialization.h"
 
 int main()
 {
-    initialize();
+    infrastructure::initialize();
 
     /*
      * :D
      */
 
-    finalize();
+    infrastructure::finalize();
 
     return 0;
 }

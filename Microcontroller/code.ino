@@ -4,8 +4,8 @@
 *  Copyright 2017 Vladimir Nikolić
 */
 
-#include "../src/system/hardware/serial_comm.h"
-#include "../src/system/comm_protocol.h"
+#include "../src/infrastructure/peripherals/hardware/serial_comm.h"
+#include "../src/infrastructure/peripherals/comm_protocol.h"
 
 // Motor enable pins
 const unsigned ENABLE_PINS[] = { 4, 8 };
@@ -80,6 +80,18 @@ inline void read_distance(int16_t *distance)
     *distance = 0;
 }
 
+inline void read_accelerometer_data(int16_t *ax, int16_t *ay, int16_t *az)
+{
+    *ax = 0;
+    *ay = 0;
+    *az = 0;
+}
+
+inline void read_power_status(int16_t *status)
+{
+    *status = 0;
+}
+
 void setup()
 {
     unsigned pin;
@@ -131,6 +143,26 @@ void loop()
             read_distance(&distance);
             send_distance(distance);
 			
+            break;
+        }
+        case ACCELEROMETER_REQUEST:
+        {
+            int16_t ax;
+            int16_t ay;
+            int16_t az;
+            
+            read_accelerometer_data(&ax, &ay, &az);
+            send_accelerometer_data(ax, ay, az);
+
+            break;
+        }
+        case POWER_STATUS_REQUEST:
+        {
+            int16_t status;
+            
+            read_power_status(&status);
+            send_power_status(status);
+        
             break;
         }
     }

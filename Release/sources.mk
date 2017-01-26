@@ -23,8 +23,8 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+src/infrastructure \
+src/infrastructure/peripherals \
+src/infrastructure/peripherals/hardware \
 src \
-src/system \
-src/system/peripherals \
-src/system/peripherals/hardware \
 
