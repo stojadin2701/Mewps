@@ -19,6 +19,10 @@ public:
 	// Returns distance registered in centimeters
 	static float get_distance();
 
+private:
+
+    static constexpr float CONVERSION_FACTOR = 0.001;
+
 };
 
 }  /* namespace infrastructure */

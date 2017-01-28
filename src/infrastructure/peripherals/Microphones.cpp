@@ -5,9 +5,9 @@
  *      Author: schutzekatze
  */
 
-#include "../../infrastructure/peripherals/Microphones.h"
+#include "Microphones.h"
 
-#include "../../infrastructure/peripherals/comm_protocol_threadsafe.h"
+#include "CommProtocolThreadsafe.h"
 
 namespace infrastructure
 {
@@ -16,7 +16,7 @@ void Microphones::get_intensities(float *intensity1, float *intensity2, float *i
 {
     int16_t int_intensity1, int_intensity2, int_intensity3;
 
-    request_microphone_data_ts(&int_intensity1, &int_intensity2, &int_intensity3);
+    CommProtocolThreadsafe::request_microphone_data_ts(&int_intensity1, &int_intensity2, &int_intensity3);
 
     *intensity1 = CONVERSION_FACTOR * int_intensity1;
     *intensity2 = CONVERSION_FACTOR * int_intensity2;

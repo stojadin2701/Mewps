@@ -7,10 +7,7 @@
 #ifndef INFRASTRUCTURE_PERIPHERALS_COMM_PROTOCOL_H_
 #define INFRASTRUCTURE_PERIPHERALS_COMM_PROTOCOL_H_
 
-#include "../../infrastructure/peripherals/hardware/serial_comm.h"
-
-namespace infrastructure
-{
+#include "hardware/serial_comm.h"
 
 // Unique preambles to identify message type
 const int16_t MICROPHONE_REQUEST = 0;
@@ -89,7 +86,5 @@ inline void send_power_status(const int16_t status)
 {
     serial_comm_send(status);
 }
-
-}  /* namespace infrastructure */
 
 #endif /* INFRASTRUCTURE_PERIPHERALS_COMM_PROTOCOL_H_ */

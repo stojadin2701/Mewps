@@ -1,3 +1,4 @@
-src/main.o: ../src/main.cpp ../src/infrastructure/initialization.h
+src/main.o: ../src/main.cpp \
+ ../src/infrastructure/peripherals/Microphones.h
 
-../src/infrastructure/initialization.h:
+../src/infrastructure/peripherals/Microphones.h:

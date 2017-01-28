@@ -4,7 +4,7 @@
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#include "../infrastructure/Task.h"
+#include "Task.h"
 
 using std::unique_lock;
 

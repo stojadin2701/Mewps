@@ -4,9 +4,9 @@
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#include "../../infrastructure/peripherals/PowerSupply.h"
+#include "PowerSupply.h"
 
-#include "../../infrastructure/peripherals/comm_protocol_threadsafe.h"
+#include "CommProtocolThreadsafe.h"
 
 namespace infrastructure
 {
@@ -15,7 +15,7 @@ float PowerSupply::get_supply_status()
 {
 	int16_t int_status;
 
-	request_power_status_ts(&int_status);
+	CommProtocolThreadsafe::request_power_status_ts(&int_status);
 
 	return (int_status * CONVERSION_FACTOR - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE);
 }

@@ -4,7 +4,7 @@
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#include "../infrastructure/EnvironmentMap.h"
+#include "EnvironmentMap.h"
 
 namespace infrastructure
 {

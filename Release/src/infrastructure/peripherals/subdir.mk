@@ -6,29 +6,29 @@
 CPP_SRCS += \
 ../src/infrastructure/peripherals/Accelerometer.cpp \
 ../src/infrastructure/peripherals/Camera.cpp \
+../src/infrastructure/peripherals/CommProtocolThreadsafe.cpp \
 ../src/infrastructure/peripherals/DistanceSensor.cpp \
 ../src/infrastructure/peripherals/Microphones.cpp \
 ../src/infrastructure/peripherals/Motors.cpp \
-../src/infrastructure/peripherals/PowerSupply.cpp \
-../src/infrastructure/peripherals/comm_protocol_threadsafe.cpp 
+../src/infrastructure/peripherals/PowerSupply.cpp 
 
 OBJS += \
 ./src/infrastructure/peripherals/Accelerometer.o \
 ./src/infrastructure/peripherals/Camera.o \
+./src/infrastructure/peripherals/CommProtocolThreadsafe.o \
 ./src/infrastructure/peripherals/DistanceSensor.o \
 ./src/infrastructure/peripherals/Microphones.o \
 ./src/infrastructure/peripherals/Motors.o \
-./src/infrastructure/peripherals/PowerSupply.o \
-./src/infrastructure/peripherals/comm_protocol_threadsafe.o 
+./src/infrastructure/peripherals/PowerSupply.o 
 
 CPP_DEPS += \
 ./src/infrastructure/peripherals/Accelerometer.d \
 ./src/infrastructure/peripherals/Camera.d \
+./src/infrastructure/peripherals/CommProtocolThreadsafe.d \
 ./src/infrastructure/peripherals/DistanceSensor.d \
 ./src/infrastructure/peripherals/Microphones.d \
 ./src/infrastructure/peripherals/Motors.d \
-./src/infrastructure/peripherals/PowerSupply.d \
-./src/infrastructure/peripherals/comm_protocol_threadsafe.d 
+./src/infrastructure/peripherals/PowerSupply.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

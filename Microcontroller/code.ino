@@ -12,33 +12,66 @@ const unsigned ENABLE_PINS[] = { 4, 8 };
 // Left and right motor pins respectively
 const unsigned MOTOR_PINS[] = { 5, 6, 9, 10 };
 
-void serial_comm_initialize()
-{
-    Serial.begin(BAUD_RATE);
-}
-
-void serial_comm_finalize()
-{
-    Serial.end();
-}
-
 void serial_comm_send(const int16_t msg)
 {
     int16_t network_msg = ((msg << 8) & 0xff00) | ((msg >> 8) & 0x00ff);
-    Serial.write((const uint8_t*)&network_msg, sizeof(network_msg));
+    
+    unsigned bytes;
+    int i;
+	for(i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
+	{
+		bytes = 0;
+	    while (bytes < sizeof(network_msg))
+	    {
+	        bytes += Serial.write((const uint8_t*)&network_msg + bytes, sizeof(network_msg) - bytes);
+	    }
+
+	    uint8_t checksum = (network_msg & 0x00ff) + (network_msg >> 8 & 0x00ff);
+	    Serial.write(&checksum, sizeof(checksum));
+
+	    while (Serial.available() == 0);
+        uint8_t response = Serial.read();
+
+	    if (fabs((int)response - ACKNOWLEDGE) < fabs((int)response - NEGATIVE_ACKNOWLEDGE))
+	    {
+	        break;
+	    }
+	}
 }
 
 int16_t serial_comm_receive()
 {
     int16_t msg;
-    char* byte = ((char*)&msg) + 1;
-    for (char i = 0; i < 2; i++)
-    {
-        while (Serial.available() == 0);
+    
+	int i;
+	for(i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
+	{
+	    uint8_t *byte = (uint8_t*)&msg + sizeof(msg) - 1;
+        unsigned j;
+        for (j = 0; j < sizeof(msg); j++)
+        {
+            while (Serial.available() == 0);
 		
-        *byte = Serial.read();
-        byte--;
-    }
+            *byte = Serial.read();
+            byte--;
+        }
+	    
+        while (Serial.available() == 0);
+
+	    uint8_t checksum = Serial.read();
+
+	    if ((msg & 0x00ff) + (msg >> 8 & 0x00ff) == checksum)
+	    {
+	        Serial.write((const uint8_t*)&ACKNOWLEDGE, sizeof(ACKNOWLEDGE));
+
+	        break;
+	    }
+	    else
+	    {
+            Serial.write((const uint8_t*)&NEGATIVE_ACKNOWLEDGE, sizeof(NEGATIVE_ACKNOWLEDGE));
+	    }
+	}
+
     return msg;
 }
 
@@ -107,7 +140,7 @@ void setup()
         pinMode(MOTOR_PINS[pin], OUTPUT);
     }
 
-    serial_comm_initialize();
+    Serial.begin(BAUD_RATE);
 }
 
 void loop()

@@ -5,9 +5,9 @@
  *      Author: schutzekatze
  */
 
-#include "../../infrastructure/peripherals/DistanceSensor.h"
+#include "DistanceSensor.h"
 
-#include "../../infrastructure/peripherals/comm_protocol_threadsafe.h"
+#include "CommProtocolThreadsafe.h"
 
 namespace infrastructure
 {
@@ -16,9 +16,9 @@ float DistanceSensor::get_distance()
 {
 	int16_t millimeters;
 
-	request_distance_ts(&millimeters);
+	CommProtocolThreadsafe::request_distance_ts(&millimeters);
 
-	return millimeters / 1000.0;
+	return CONVERSION_FACTOR * millimeters;
 }
 
 }  /* namespace infrastructure */

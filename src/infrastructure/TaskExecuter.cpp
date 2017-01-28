@@ -4,7 +4,7 @@
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#include "../infrastructure/TaskExecuter.h"
+#include "TaskExecuter.h"
 
 using std::unique_lock;
 

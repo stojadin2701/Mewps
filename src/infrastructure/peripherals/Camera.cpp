@@ -4,7 +4,7 @@
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#include "../../infrastructure/peripherals/Camera.h"
+#include "Camera.h"
 
 namespace infrastructure
 {
