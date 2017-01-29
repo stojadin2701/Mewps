@@ -20,12 +20,12 @@ using std::fabs;
 
 #include "serial_comm.h"
 
-void serial_comm_send(const int16_t msg)
+void serial_comm_send(const uint16_t msg)
 {
 	infrastructure::SerialCommunicator::send(msg);
 }
 
-int16_t serial_comm_receive()
+uint16_t serial_comm_receive()
 {
 	return infrastructure::SerialCommunicator::receive();
 }
@@ -39,9 +39,9 @@ atomic<int> SerialCommunicator::failures(0);
 
 SerialCommunicator::Init SerialCommunicator::init;
 
-void SerialCommunicator::send(const int16_t msg)
+void SerialCommunicator::send(const uint16_t msg)
 {
-    int16_t network_msg = htons(msg);
+    uint16_t network_msg = htons(msg);
     bool successful = false;
     unsigned bytes, new_bytes;
 
@@ -82,9 +82,9 @@ void SerialCommunicator::send(const int16_t msg)
 	}
 }
 
-int16_t SerialCommunicator::receive()
+uint16_t SerialCommunicator::receive()
 {
-	int16_t network_msg;
+	uint16_t network_msg;
 	bool successful = false;
 	unsigned bytes, new_bytes;
 

@@ -12,9 +12,9 @@ const unsigned ENABLE_PINS[] = { 4, 8 };
 // Left and right motor pins respectively
 const unsigned MOTOR_PINS[] = { 5, 6, 9, 10 };
 
-void serial_comm_send(const int16_t msg)
+void serial_comm_send(const uint16_t msg)
 {
-    int16_t network_msg = ((msg << 8) & 0xff00) | ((msg >> 8) & 0x00ff);
+    uint16_t network_msg = ((msg << 8) & 0xff00) | ((msg >> 8) & 0x00ff);
     
     unsigned bytes;
     int i;
@@ -39,9 +39,9 @@ void serial_comm_send(const int16_t msg)
 	}
 }
 
-int16_t serial_comm_receive()
+uint16_t serial_comm_receive()
 {
-    int16_t msg;
+    uint16_t msg;
     
 	int i;
 	for(i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)

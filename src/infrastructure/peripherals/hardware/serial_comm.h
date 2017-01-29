@@ -37,7 +37,7 @@ const uint8_t NEGATIVE_ACKNOWLEDGE = 0;
 const int ATTEMPTS_BEFORE_ABORT = 3;
 
 // These functions require platform specific implementations to use serial communication.
-void serial_comm_send(const int16_t msg);
-int16_t serial_comm_receive();
+void serial_comm_send(const uint16_t msg);
+uint16_t serial_comm_receive();
 
 #endif /* INFRASTRUCTURE_PERIPHERALS_HARDWARE_SERIAL_COMM_H_ */

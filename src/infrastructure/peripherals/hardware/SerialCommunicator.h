@@ -22,8 +22,8 @@ public:
 
 	static constexpr int TIMEOUT_PERIOD = 20; //tenths of a second
 
-	static void send(const int16_t msg);
-	static int16_t receive();
+	static void send(const uint16_t msg);
+	static uint16_t receive();
 
 	static int get_failures();
 
