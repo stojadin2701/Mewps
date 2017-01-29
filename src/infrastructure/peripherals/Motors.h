@@ -31,8 +31,7 @@ private:
 
     static constexpr float CONVERSION_FACTOR = 255.0;
 
-    static float power_left;
-    static float power_right;
+    static float power_left, power_right;
 
 };
 
