@@ -44,8 +44,9 @@ void SerialCommunicator::send(const uint16_t msg)
     uint16_t network_msg = htons(msg);
     bool successful = false;
     unsigned bytes, new_bytes;
+    uint8_t checksum, response;
 
-	for(int i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
+	for(unsigned i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
 	{
 		bytes = 0;
 	    while (bytes < sizeof(network_msg))
@@ -53,10 +54,9 @@ void SerialCommunicator::send(const uint16_t msg)
 	    	bytes += write(tty, (uint8_t*)&network_msg + bytes, sizeof(network_msg) - bytes);
 	    }
 
-	    uint8_t checksum = (network_msg & 0x00ff) + (network_msg >> 8 & 0x00ff);
+	    checksum = (network_msg & 0x00ff) + (network_msg >> 8 & 0x00ff);
 	    write(tty, &checksum, sizeof(checksum));
 
-	    uint8_t response;
 	    new_bytes = read(tty, &response, sizeof(response));
 
     	if (new_bytes == 0)
@@ -87,8 +87,9 @@ uint16_t SerialCommunicator::receive()
 	uint16_t network_msg;
 	bool successful = false;
 	unsigned bytes, new_bytes;
+	uint8_t checksum;
 
-	for(int i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
+	for(unsigned i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
 	{
 		bytes = 0;
 	    while (bytes < sizeof(network_msg))
@@ -103,7 +104,6 @@ uint16_t SerialCommunicator::receive()
 	    	bytes += new_bytes;
 	    }
 
-	    uint8_t checksum;
 	    new_bytes = read(tty, &checksum, sizeof(checksum));
 
     	if (new_bytes == 0)
@@ -111,7 +111,7 @@ uint16_t SerialCommunicator::receive()
     		throw SerialCommTimeoutError();
     	}
 
-	    if ((network_msg & 0x00ff) + (network_msg >> 8 & 0x00ff) == checksum)
+	    if ((uint8_t)((network_msg & 0x00ff) + (network_msg >> 8 & 0x00ff)) == checksum)
 	    {
 	        write(tty, &ACKNOWLEDGE, sizeof(ACKNOWLEDGE));
 

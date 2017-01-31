@@ -4,8 +4,7 @@
  *  Copyright 2017 Vladimir Nikolić
  */
 
-#include "infrastructure/peripherals/Microphones.h"
-using infrastructure::Microphones;
+#include "infrastructure/peripherals/hardware/serial_comm.h"
 
 #include <iostream>
 using std::cout;
@@ -27,12 +26,16 @@ int main()
 
 	try
 	{
-		float a, b, c;
+		int16_t msg, response;
 		while (true)
 		{
-            Microphones::get_intensities(&a, &b, &c);
+            msg = -7;
 
-            cout << a << " " << b << " " << c << endl;
+            serial_comm_send(msg);
+
+            response = serial_comm_receive();
+
+            cout << response << endl;
 		}
 	}
 	catch (exception &e)

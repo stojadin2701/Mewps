@@ -15,9 +15,10 @@ const unsigned MOTOR_PINS[] = { 5, 6, 9, 10 };
 void serial_comm_send(const uint16_t msg)
 {
     uint16_t network_msg = ((msg << 8) & 0xff00) | ((msg >> 8) & 0x00ff);
-    
     unsigned bytes;
-    int i;
+    uint8_t checksum, response;
+    
+    unsigned i;
 	for(i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
 	{
 		bytes = 0;
@@ -26,11 +27,11 @@ void serial_comm_send(const uint16_t msg)
 	        bytes += Serial.write((const uint8_t*)&network_msg + bytes, sizeof(network_msg) - bytes);
 	    }
 
-	    uint8_t checksum = (network_msg & 0x00ff) + (network_msg >> 8 & 0x00ff);
+	    checksum = (network_msg & 0x00ff) + (network_msg >> 8 & 0x00ff);
 	    Serial.write(&checksum, sizeof(checksum));
 
 	    while (Serial.available() == 0);
-        uint8_t response = Serial.read();
+        response = Serial.read();
 
 	    if (fabs((int)response - ACKNOWLEDGE) < fabs((int)response - NEGATIVE_ACKNOWLEDGE))
 	    {
@@ -41,26 +42,25 @@ void serial_comm_send(const uint16_t msg)
 
 uint16_t serial_comm_receive()
 {
-    uint16_t msg;
+    uint16_t network_msg;
+    uint8_t *byte, checksum;
     
-	int i;
+	unsigned i, j;
 	for(i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
 	{
-	    uint8_t *byte = (uint8_t*)&msg + sizeof(msg) - 1;
-        unsigned j;
-        for (j = 0; j < sizeof(msg); j++)
+	    byte = (uint8_t*)&network_msg;
+        for (j = 0; j < sizeof(network_msg); j++)
         {
             while (Serial.available() == 0);
 		
             *byte = Serial.read();
-            byte--;
+            byte++;
         }
 	    
         while (Serial.available() == 0);
+	    checksum = Serial.read();
 
-	    uint8_t checksum = Serial.read();
-
-	    if ((msg & 0x00ff) + (msg >> 8 & 0x00ff) == checksum)
+	    if ((uint8_t)((network_msg & 0x00ff) + (network_msg >> 8 & 0x00ff)) == checksum)
 	    {
 	        Serial.write((const uint8_t*)&ACKNOWLEDGE, sizeof(ACKNOWLEDGE));
 
@@ -72,7 +72,7 @@ uint16_t serial_comm_receive()
 	    }
 	}
 
-    return msg;
+    return ((network_msg << 8) & 0xff00) | ((network_msg >> 8) & 0x00ff);
 }
 
 inline void read_microphone_data(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3)
@@ -145,6 +145,16 @@ void setup()
 
 void loop()
 {
+    int16_t msg;
+
+    msg = serial_comm_receive();
+    
+    msg++;
+    
+    serial_comm_send(msg);
+
+    return;
+
     int16_t preamble = receive_preamble();
     switch (preamble)
     {
