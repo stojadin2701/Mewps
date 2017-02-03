@@ -140,7 +140,7 @@ int SerialCommunicator::get_failures()
     return failures;
 }
 
-constexpr int baud2constant(const int baud)
+int baud2constant(const int baud)
 {
     switch (baud)
     {
