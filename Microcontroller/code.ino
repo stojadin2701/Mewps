@@ -145,16 +145,6 @@ void setup()
 
 void loop()
 {
-    int16_t msg;
-
-    msg = serial_comm_receive();
-    
-    msg++;
-    
-    serial_comm_send(msg);
-
-    return;
-
     int16_t preamble = receive_preamble();
     switch (preamble)
     {

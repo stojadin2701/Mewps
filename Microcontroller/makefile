@@ -98,7 +98,7 @@ ARDUINO_DIR ?=	/usr/share/arduino
 ARCH ?= avr
 
 # Location of the avr directory.
-AVR_DIR ?= $(ARDUINO_DIR)/hardware/archlinux-arduino/avr
+AVR_DIR ?= $(ARDUINO_DIR)/hardware/arduino
 
 # USB port the Arduino board is connected to.
 # Linux: e.g. /dev/ttyUSB0, or /dev/ttyACM0 for the Uno.
