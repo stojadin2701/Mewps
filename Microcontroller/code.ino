@@ -11,13 +11,17 @@
 const unsigned ENABLE_PINS[] = { 4, 8 };
 // Left and right motor pins respectively
 const unsigned MOTOR_PINS[] = { 5, 6, 9, 10 };
+// Front, right, and left microphone input pins, respectively
+const unsigned MIC_PINS[] = {A0, A1, A2};
+// Sample window width in mS (50 mS = 20Hz)
+const unsigned sample_window = 50;
 
 void serial_comm_send(const uint16_t msg)
 {
     uint16_t network_msg = ((msg << 8) & 0xff00) | ((msg >> 8) & 0x00ff);
     unsigned bytes;
     uint8_t checksum, response;
-    
+
     unsigned i;
     for(i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
     {
@@ -44,7 +48,7 @@ uint16_t serial_comm_receive()
 {
     uint16_t network_msg;
     uint8_t *byte, checksum;
-    
+
     unsigned i, j;
     for(i = 0; i < ATTEMPTS_BEFORE_ABORT; i++)
     {
@@ -52,11 +56,11 @@ uint16_t serial_comm_receive()
         for (j = 0; j < sizeof(network_msg); j++)
         {
             while (Serial.available() == 0);
-		
+
             *byte = Serial.read();
             byte++;
         }
-	    
+
         while (Serial.available() == 0);
         checksum = Serial.read();
 
@@ -75,11 +79,40 @@ uint16_t serial_comm_receive()
     return ((network_msg << 8) & 0xff00) | ((network_msg >> 8) & 0x00ff);
 }
 
+inline void read_mic(unsigned int mic, int16_t *value){
+    unsigned long start_millis= millis();  // Start of sample window
+    unsigned int peak_to_peak = 0;   // peak-to-peak level
+
+    unsigned int signal_max = 0;
+    unsigned int signal_min = 1024;
+
+    // collect data for 50 mS
+    while (millis() - start_millis < sample_window)
+    {
+       sample = analogRead(0);
+       if (sample < 1024)  // toss out spurious readings
+       {
+          if (sample > signal_max)
+          {
+             signal_max = sample;  // save just the max levels
+          }
+          else if (sample < signal_min)
+          {
+             signal_min = sample;  // save just the min levels
+          }
+       }
+    }
+    peak_to_peak = signal_max - signal_min;  // max - min = peak-peak amplitude
+    //double volts = (peakToPeak * 5.0) / 1024;  // convert to volts
+    //Serial.println(volts);
+    *value = peak_to_peak;
+}
+
 inline void read_microphone_data(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3)
 {
-    *intensity1 = 0;
-    *intensity2 = 0;
-    *intensity3 = 0;
+    read_mic(A0, intensity1);
+    read_mic(A0, intensity2);
+    read_mic(A0, intensity3);
 }
 
 inline void set_motors_power(int16_t power_left, int16_t power_right)
@@ -128,7 +161,7 @@ inline void read_power_status(int16_t *status)
 void setup()
 {
     unsigned pin;
-    
+
     for (pin = 0; pin < sizeof(ENABLE_PINS) / sizeof(unsigned); pin++)
     {
         pinMode(ENABLE_PINS[pin], OUTPUT);
@@ -156,9 +189,9 @@ void loop()
 
             read_microphone_data(&intensity1, &intensity2, &intensity3);
             send_microphone_data(intensity1, intensity2, intensity3);
-	
-            break;		
-        }		
+
+            break;
+        }
         case MOTORS_COMMAND:
         {
             int16_t power_left;
@@ -166,16 +199,16 @@ void loop()
 
             receive_motors_command(&power_left, &power_right);
             set_motors_power(power_left, power_right);
-			
+
             break;
         }
         case DISTANCE_REQUEST:
         {
             int16_t distance;
-		
+
             read_distance(&distance);
             send_distance(distance);
-			
+
             break;
         }
         case ACCELEROMETER_REQUEST:
@@ -183,7 +216,7 @@ void loop()
             int16_t ax;
             int16_t ay;
             int16_t az;
-            
+
             read_accelerometer_data(&ax, &ay, &az);
             send_accelerometer_data(ax, ay, az);
 
@@ -192,10 +225,10 @@ void loop()
         case POWER_STATUS_REQUEST:
         {
             int16_t status;
-            
+
             read_power_status(&status);
             send_power_status(status);
-        
+
             break;
         }
     }

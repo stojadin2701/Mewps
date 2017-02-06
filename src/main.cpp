@@ -5,6 +5,8 @@
  */
 
 #include "infrastructure/peripherals/hardware/serial_comm.h"
+#include "infrastructure/peripherals/hardware/Microphones.h"
+using infrastructure::Microphones;
 
 #include <iostream>
 using std::cout;
@@ -26,7 +28,15 @@ int main()
 
 	try
 	{
-		int16_t msg, response;
+		for(int i=0; i<10; i++){
+				float f1, f2, f3;
+				get_intensities(&f1, &f2, &f3);
+				cout << "Front: " << f1 << "Right: " << f2 << "Left: "<< f3 << endl;
+				sleep_for(milliseconds(3000));
+		}
+
+
+	/*int16_t msg, response;
 		while (true)
 		{
             msg = -7;
@@ -36,7 +46,7 @@ int main()
             response = serial_comm_receive();
 
             cout << response << endl;
-		}
+		}*/
 	}
 	catch (exception &e)
 	{
@@ -45,5 +55,3 @@ int main()
 
     return 0;
 }
-
-
