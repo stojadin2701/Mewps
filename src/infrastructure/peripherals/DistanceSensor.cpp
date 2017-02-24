@@ -5,6 +5,7 @@
  *      Author: schutzekatze
  */
 
+#include <stdint.h>
 #include "DistanceSensor.h"
 
 #include "CommProtocolThreadsafe.h"
