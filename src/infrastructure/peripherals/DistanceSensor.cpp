@@ -18,7 +18,7 @@ float DistanceSensor::get_distance()
 
 	CommProtocolThreadsafe::request_distance_ts(&millimeters);
 
-	return CONVERSION_FACTOR * millimeters;
+	return millimeters;
 }
 
 }  /* namespace infrastructure */

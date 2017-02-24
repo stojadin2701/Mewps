@@ -1,9 +1,3 @@
-/*
-* code.ino
-*
-*  Copyright 2017 Vladimir Nikolić
-*/
-
 #include "../src/infrastructure/peripherals/hardware/serial_comm.h"
 #include "../src/infrastructure/peripherals/comm_protocol.h"
 
@@ -82,14 +76,14 @@ uint16_t serial_comm_receive()
 inline void read_mic(unsigned int mic, int16_t *value){
     unsigned long start_millis= millis();  // Start of sample window
     unsigned int peak_to_peak = 0;   // peak-to-peak level
-
+    unsigned int sample = 0;
     unsigned int signal_max = 0;
     unsigned int signal_min = 1024;
 
     // collect data for 50 mS
     while (millis() - start_millis < sample_window)
     {
-       sample = analogRead(0);
+       sample = analogRead(mic);
        if (sample < 1024)  // toss out spurious readings
        {
           if (sample > signal_max)
@@ -111,8 +105,8 @@ inline void read_mic(unsigned int mic, int16_t *value){
 inline void read_microphone_data(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3)
 {
     read_mic(A0, intensity1);
-    read_mic(A0, intensity2);
-    read_mic(A0, intensity3);
+    read_mic(A1, intensity2);
+    read_mic(A2, intensity3);
 }
 
 inline void set_motors_power(int16_t power_left, int16_t power_right)

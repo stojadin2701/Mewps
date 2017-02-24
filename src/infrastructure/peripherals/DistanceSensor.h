@@ -21,7 +21,7 @@ public:
 
 private:
 
-    static constexpr float CONVERSION_FACTOR = 0.001;
+   // static constexpr float CONVERSION_FACTOR = 0.001;
 
 };
 

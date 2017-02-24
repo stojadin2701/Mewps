@@ -18,9 +18,16 @@ void Microphones::get_intensities(float *intensity1, float *intensity2, float *i
 
     CommProtocolThreadsafe::request_microphone_data_ts(&int_intensity1, &int_intensity2, &int_intensity3);
 
-    *intensity1 = CONVERSION_FACTOR * int_intensity1;
+   /* *intensity1 = CONVERSION_FACTOR * int_intensity1;
     *intensity2 = CONVERSION_FACTOR * int_intensity2;
     *intensity3 = CONVERSION_FACTOR * int_intensity3;
+	*/
+	
+  *intensity1 = int_intensity1;
+  *intensity2 = int_intensity2;
+  *intensity3 = int_intensity3;
+  
+
 }
 
 }  /* namespace infrastructure */
