@@ -12,7 +12,7 @@
 namespace infrastructure
 {
 
-float DistanceSensor::get_distance()
+int16_t DistanceSensor::get_distance()
 {
 	int16_t millimeters;
 
