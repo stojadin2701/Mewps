@@ -23,7 +23,6 @@ using std::chrono::milliseconds;
 
 bool stop = false;
 
-
 void distanceThread(){
 	int16_t distance;
 	for(int i=0; i<300; i++){
@@ -36,7 +35,7 @@ void distanceThread(){
 			Motors::set_powers(0,0);
 			break;
 		}
-	
+
 		sleep_for(milliseconds(35));
 	}
 
@@ -53,21 +52,35 @@ int main()
 
 		try
 		{
-			Motors::set_powers(0.5,0.5);
-			sleep_for(milliseond(3000));
-			for(int i=0; i<30; i++){
-					float f1, f2, f3;
-					Microphones::get_intensities(&f1, &f2, &f3);
-					cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
-					sleep_for(milliseconds(300));
+			for(int k=0; k<5; k++){
+			//for(int i=0; i<30; i++){
+				int16_t f1, f2, f3;
+				Microphones::get_intensities(&f1, &f2, &f3);
+				cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
+				if(f1>f2 && f1>f3){
+					Motors::set_powers(0.5,0.5);
+					sleep_for(milliseond(3000));
+					Motors::set_powers(0,0);
 				}
-			Motors::set_powers(0,0);
+				else if(f2>f1 && f2>f3){
+					Motors::set_powers(0.75, -0.8);
+					sleep_for(milliseconds(1000));
+					Motors::set_powers(0, 0);
+				}
+				else if(f3>f1 && f3>f2){
+					Motors::set_powers(-0.8, 0.65);
+					sleep_for(milliseconds(1000));
+					Motors::set_powers(0,0);
+				}
+				//sleep_for(milliseconds(200));
+				//}
+
 			if(stop){
 				sleep_for(milliseconds(300));
 				Motors::set_powers(0.75, -0.8);
 				sleep_for(milliseconds(1000));
 				Motors::set_powers(0, 0);
-				sleep_for(milliseconds(500));	
+				sleep_for(milliseconds(500));
 				Motors::set_powers(0.5, 0.5);
 				sleep_for(milliseconds(1000));
 				Motors::set_powers(0,0);
@@ -76,8 +89,8 @@ int main()
 				sleep_for(milliseconds(1000));
 				Motors::set_powers(0,0);
 			}
+		}
 
-			
 		}
 		catch (exception &e)
 		{

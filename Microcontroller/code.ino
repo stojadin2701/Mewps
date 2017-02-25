@@ -2,6 +2,7 @@
 #include "../src/infrastructure/peripherals/comm_protocol.h"
 
 #define DISTANCE_SAMPLING_NUM 5
+#define MIC_SAMPLING_NUM 3
 
 // Motor enable pins
 const unsigned ENABLE_PINS[] = { 4, 8 };
@@ -115,9 +116,19 @@ inline void read_mic(unsigned int mic, int16_t *value){
 
 inline void read_microphone_data(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3)
 {
-	read_mic(A0, intensity1);
-	read_mic(A1, intensity2);
-	read_mic(A2, intensity3);
+	int16_t i1_sum=0, i2_sum=0, i3_sum=0;
+	int16_t i1, i2, i3;
+	for(int i=0; i<MIC_SAMPLING_NUM; i++){
+		read_mic(A0, &i1);
+		read_mic(A1, &i2);
+		read_mic(A2, &i3);
+		i1_sum+=i1;
+		i2_sum+=i2;
+		i3_sum+=i3;
+	}
+	*intensity1 = i1_sum/MIC_SAMPLING_NUM;
+	*intensity2 = i2_sum/MIC_SAMPLING_NUM;
+	*intensity3 = i3_sum/MIC_SAMPLING_NUM;
 }
 
 inline void set_motors_power(int16_t power_left, int16_t power_right)

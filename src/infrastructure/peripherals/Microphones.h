@@ -17,7 +17,7 @@ class Microphones
 public:
 
 	// Returns registered intensities for each microphone
-	static void get_intensities(float *intensity1, float *intensity2, float *intensity3);
+	static void get_intensities(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3);
 
 private:
 
