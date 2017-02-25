@@ -165,7 +165,7 @@ inline void read_distance(int16_t *distance)
 		duration=pulseIn(echo_pin, HIGH);
 		cm=microsecondsToCentimeters(duration);
 		sum+=cm;
-		delay(25);
+		delay(35);
 	}
 	avg = sum/DISTANCE_SAMPLING_NUM;
 	*distance = avg;
