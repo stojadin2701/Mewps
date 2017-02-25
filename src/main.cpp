@@ -53,7 +53,7 @@ void* hello(void* arg){
 void distanceThread(){
 	int16_t distance;
 	for(int i=0; i<300; i++){
-		//distance = DistanceSensor::get_distance();
+		distance = DistanceSensor::get_distance();
 		cout << "Distance: " << distance << endl;
 		sleep_for(milliseconds(600));
 	}
@@ -61,7 +61,7 @@ void distanceThread(){
 
 int main()
 {
-	//sleep_for(milliseconds(2000));
+	sleep_for(milliseconds(2000));
 
 	cout << "start" << endl;
 /*
