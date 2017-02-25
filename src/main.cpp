@@ -97,7 +97,7 @@ int main()
 	// for( i = 0; i < NUM_THREADS; i++)
 	// 	pthread_join(threads[i], NULL);
 
-	thread disThread(distanceThread);
+//	thread disThread(distanceThread);
 
 		try
 		{
@@ -113,7 +113,7 @@ int main()
 		cout << e.what() << endl;
 		}
 
-		disThread.join();
+//		disThread.join();
 
 	//pthread_join(disThread, NULL);
 
