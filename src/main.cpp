@@ -13,6 +13,7 @@ using std::endl;
 using std::exception;
 
 #include <thread>
+using std::thread;
 #include <chrono>
 using std::this_thread::sleep_for;
 using std::chrono::milliseconds;
@@ -49,7 +50,7 @@ void* hello(void* arg){
 	   go on to do more work in parallel.  */
 }
 
-void* distanceThread(void* arg){
+void distanceThread(){
 	int16_t distance;
 	for(int i=0; i<300; i++){
 		distance = DistanceSensor::get_distance();
@@ -63,9 +64,10 @@ int main()
 	//sleep_for(milliseconds(2000));
 
 	cout << "start" << endl;
-
+/*
 	pthread_t disThread;
 	pthread_create(&disThread, NULL, distanceThread, NULL);
+*/
 
 	// pthread_t threads[NUM_THREADS];
 	//
@@ -95,21 +97,25 @@ int main()
 	// for( i = 0; i < NUM_THREADS; i++)
 	// 	pthread_join(threads[i], NULL);
 
+	thread disThread(distanceThread);
+
 		try
 		{
-		for(int i=0; i<300; i++){
-		float f1, f2, f3;
-		Microphones::get_intensities(&f1, &f2, &f3);
-		cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
-		sleep_for(milliseconds(300));
-		}
+			for(int i=0; i<300; i++){
+					float f1, f2, f3;
+					Microphones::get_intensities(&f1, &f2, &f3);
+					cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
+					sleep_for(milliseconds(300));
+				}
 		}
 		catch (exception &e)
 		{
 		cout << e.what() << endl;
 		}
 
-	pthread_join(disThread, NULL);
+		disThread.join();
+
+	//pthread_join(disThread, NULL);
 
 
 	/* Destroy all synchronization primitives.  */
