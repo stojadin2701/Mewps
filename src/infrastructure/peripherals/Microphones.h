@@ -8,6 +8,8 @@
 #ifndef INFRASTRUCTURE_PERIPHERALS_MICROPHONES_H_
 #define INFRASTRUCTURE_PERIPHERALS_MICROPHONES_H_
 
+#include<stdint.h>
+
 namespace infrastructure
 {
 
