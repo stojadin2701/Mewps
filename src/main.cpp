@@ -125,7 +125,7 @@ int main()
 
 	cout << "start" << endl;
 
-//	thread disThread(distanceThread);
+	thread disThread(distanceThread);
 
 	try
 	{
