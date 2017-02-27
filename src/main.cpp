@@ -41,13 +41,27 @@ void distanceThread(){
 			Motors::set_powers(-0.5,-0.5);
 			sleep_for(milliseconds(1000));
 			Motors::set_powers(0,0);
-		//	break;
+			//	break;
 		}
 
 		sleep_for(milliseconds(35));
 	}
+}
 
-
+void recoveryThread(){
+	cout<<"RECOVERING"<<endl;
+	sleep_for(milliseconds(300));
+	Motors::set_powers(0.75, -0.8);
+	sleep_for(milliseconds(1000));
+	Motors::set_powers(0, 0);
+	sleep_for(milliseconds(500));
+	Motors::set_powers(0.5, 0.5);
+	sleep_for(milliseconds(1000));
+	Motors::set_powers(0,0);
+	sleep_for(milliseconds(500));
+	Motors::set_powers(-0.8, 0.65);
+	sleep_for(milliseconds(1000));
+	Motors::set_powers(0,0);
 }
 
 //enum Direction { FRONT, RIGHT, LEFT, FRONT_RIGHT, FRONT_LEFT,  NONE };
@@ -101,7 +115,6 @@ int main()
 					break;
 				case LEFT:
 					cout<<"LEFT"<<endl;
-
 					Motors::set_powers(-0.8, 0.65);
 					sleep_for(milliseconds(1000));
 					Motors::set_powers(0,0);
@@ -145,13 +158,13 @@ int main()
 
 		}
 
-	}
-	catch (exception &e)
-	{
-		cout << e.what() << endl;
-	}
+		}
+		catch (exception &e)
+		{
+			cout << e.what() << endl;
+		}
 
-	disThread.join();
+		disThread.join();
 
-	return 0;
-}
+		return 0;
+	}
