@@ -38,29 +38,6 @@ enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
 //std::atomic<Direction> sound_direction {NONE};
 Direction sound_direction = NONE;
 
-void distanceThread(){
-	int16_t distance;
-	for(int i=0; i<200; i++){
-		distance = DistanceSensor::get_distance();
-		cout << "Distance: " << distance << endl;
-
-		if(distance<=20){
-			Motors::set_powers(0,0);
-			unique_lock<mutex> lock_stop(stop);
-			kill = true; //kill recoveryThread if exists
-			lock_stop.unlock();
-
-			unique_lock<mutex> lock_complete(complete);
-			ready = false;
-			lock_complete.unlock();
-
-			thread recThread(recoveryThread);
-		}
-
-		sleep_for(milliseconds(35));
-	}
-}
-
 void recoveryThread(){
 	bool check;
 	cout<<"RECOVERING"<<endl;
@@ -79,19 +56,48 @@ void recoveryThread(){
 	check = kill;
 	kill = false;
 	lock_stop.unlock();
-	if(check)std::terminate();
+	if(!check){
+		Motors::set_powers(0,0);
+		sleep_for(milliseconds(500));
+		Motors::set_powers(-0.8, 0.65);
+		sleep_for(milliseconds(1000));
+		Motors::set_powers(0,0);
+		cout<<"RECOVERY COMPLETE"<<endl;
+		//set atomic bool
+		unique_lock<mutex> lock_complete(complete);
+		ready = true;
+		lock_complete.unlock();
+		cv.notify_one();
+	}
+	else {
+		cout << "RECOVERY KILLED" << endl;
+	}
+}
 
-	Motors::set_powers(0,0);
-	sleep_for(milliseconds(500));
-	Motors::set_powers(-0.8, 0.65);
-	sleep_for(milliseconds(1000));
-	Motors::set_powers(0,0);
-	cout<<"RECOVERY COMPLETE"<<endl;
-	//set atomic bool
-	unique_lock<mutex> lock_complete(complete);
-	ready = true;
-	lock_complete.unlock();
-	cv.notify_one();
+
+
+void distanceThread(){
+	int16_t distance;
+	for(int i=0; i<200; i++){
+		distance = DistanceSensor::get_distance();
+		cout << "Distance: " << distance << endl;
+
+		if(distance<=20){
+			Motors::set_powers(0,0);
+			unique_lock<mutex> lock_stop(stop);
+			kill = true; //kill recoveryThread if exists
+			lock_stop.unlock();
+
+			unique_lock<mutex> lock_complete(complete);
+			ready = false;
+			lock_complete.unlock();
+
+			thread recThread(recoveryThread);
+			recThread.detach();
+		}
+
+		sleep_for(milliseconds(35));
+	}
 }
 
 
@@ -176,6 +182,6 @@ int main()
 		}
 
 		disThread.join();
-
+		Motors::set_powers(0,0);
 		return 0;
 	}
