@@ -41,7 +41,7 @@ void distanceThread(){
 			Motors::set_powers(-0.5,-0.5);
 			sleep_for(milliseconds(1000));
 			Motors::set_powers(0,0);
-			break;
+		//	break;
 		}
 
 		sleep_for(milliseconds(35));
@@ -51,7 +51,7 @@ void distanceThread(){
 }
 
 //enum Direction { FRONT, RIGHT, LEFT, FRONT_RIGHT, FRONT_LEFT,  NONE };
-enum Direction { FRONT, RIGHT, LEFT, NONE };
+enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
 
 Direction calculate_direction( int16_t i1, int16_t i2, int16_t i3){
 	Direction dir = NONE;
@@ -62,8 +62,8 @@ Direction calculate_direction( int16_t i1, int16_t i2, int16_t i3){
 	else if((i1-eps)>= i2 && (i1-eps)>=i3) dir = FRONT;
 	else if((i2-eps)>= i1 && (i2-eps)>=i3) dir = RIGHT;
 	else if((i3-eps)>= i1 && (i3-eps)>=i2) dir = LEFT;
-	//else if((i2+eps)<= i1 && (i2+eps)<=i3) dir = FRONT_LEFT; 	
-	//else if((i3+eps)<= i1 && (i3+eps)<=i2) dir = FRONT_RIGHT;
+	else if((i2+eps)<= i1 && (i2+eps)<=i3) dir = FRONT_SHORT; 	
+	else if((i3+eps)<= i1 && (i3+eps)<=i2) dir = FRONT_SHORT;
 
 	return dir;
 }
@@ -89,7 +89,7 @@ int main()
 				case FRONT:
 					cout<<"FRONT"<<endl;
 					Motors::set_powers(0.5,0.5);
-					sleep_for(milliseconds(3000));
+					sleep_for(milliseconds(1500));
 					Motors::set_powers(0,0);
 					break;
 				case RIGHT:
@@ -106,48 +106,23 @@ int main()
 					sleep_for(milliseconds(1000));
 					Motors::set_powers(0,0);
 					break;
-					/*		case FRONT_RIGHT:
-							cout<<"FRONT_RIGHT"<<endl;
-
-							Motors::set_powers(0.75, -0.8);
-							sleep_for(milliseconds(500));
-							Motors::set_powers(0, 0);
-							break;
-							case FRONT_LEFT:
-							cout<<"FRONT_LEFT"<<endl;	
-							Motors::set_powers(-0.8, 0.65);
-							sleep_for(milliseconds(500));
-							Motors::set_powers(0,0);
-							break; 
-					 */
+				case FRONT_SHORT:
+					cout<<"FRONT_SHORT"<<endl;
+					Motors::set_powers(0.5, 0.5);
+					sleep_for(milliseconds(800));
+					Motors::set_powers(0, 0);
+					break;
 				case NONE:
 					cout << "cry :\'(" << endl;
 					sleep_for(milliseconds(500));
 					break;
-			}	
+			}
 
-			/*			if(f1>f2 && f1>f3){
-						Motors::set_powers(0.5,0.5);
-						sleep_for(milliseconds(3000));
-						Motors::set_powers(0,0);
-						}
-						else if(f2>f1 && f2>f3){
-						Motors::set_powers(0.75, -0.8);
-						sleep_for(milliseconds(1000));
-						Motors::set_powers(0, 0);
-						}
-						else if(f3>f1 && f3>f2){
-						Motors::set_powers(-0.8, 0.65);
-						sleep_for(milliseconds(1000));
-						Motors::set_powers(0,0);
-						}
-			 */
-			//sleep_for(milliseconds(200));
-			//}
 			unique_lock<mutex> lock(recover);
 			if(stop){
 				stop = false;
 				lock.unlock();
+				cout<<"RECOVERING"<<endl;
 				sleep_for(milliseconds(300));
 				Motors::set_powers(0.75, -0.8);
 				sleep_for(milliseconds(1000));
@@ -160,6 +135,9 @@ int main()
 				Motors::set_powers(-0.8, 0.65);
 				sleep_for(milliseconds(1000));
 				Motors::set_powers(0,0);
+				lock.lock();
+				stop = false;
+				lock.unlock();
 
 			}else{
 				lock.unlock();
