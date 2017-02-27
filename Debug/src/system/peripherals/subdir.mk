@@ -9,7 +9,8 @@ CPP_SRCS += \
 ../src/system/peripherals/Microphones.cpp \
 ../src/system/peripherals/Motors.cpp \
 ../src/system/peripherals/PowerSupply.cpp \
-../src/system/peripherals/comm_protocol_threadsafe.cpp 
+../src/system/peripherals/comm_protocol_threadsafe.cpp \
+../src/system/peripherals/Speaker.cpp
 
 OBJS += \
 ./src/system/peripherals/Camera.o \
@@ -17,7 +18,9 @@ OBJS += \
 ./src/system/peripherals/Microphones.o \
 ./src/system/peripherals/Motors.o \
 ./src/system/peripherals/PowerSupply.o \
-./src/system/peripherals/comm_protocol_threadsafe.o 
+./src/system/peripherals/comm_protocol_threadsafe.o \
+./src/system/peripherals/Speaker.o
+
 
 CPP_DEPS += \
 ./src/system/peripherals/Camera.d \
@@ -25,7 +28,9 @@ CPP_DEPS += \
 ./src/system/peripherals/Microphones.d \
 ./src/system/peripherals/Motors.d \
 ./src/system/peripherals/PowerSupply.d \
-./src/system/peripherals/comm_protocol_threadsafe.d 
+./src/system/peripherals/comm_protocol_threadsafe.d \
+./src/system/peripherals/Speaker.d
+
 
 
 # Each subdirectory must supply rules for building sources it contributes

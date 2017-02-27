@@ -29,18 +29,18 @@ public:
 	    return receive_preamble();
 	}
 
+	static void send_microphone_data_ts(const int16_t intensity1, const int16_t intensity2, const int16_t intensity3)
+	{
+			unique_lock<mutex> lock(threadsafety);
+
+			send_microphone_data(intensity1, intensity2, intensity3);
+	}
+
 	static void request_microphone_data_ts(int16_t* intensity1, int16_t* intensity2, int16_t* intensity3)
 	{
 	    unique_lock<mutex> lock(threadsafety);
 
 	    request_microphone_data(intensity1, intensity2, intensity3);
-	}
-
-	static void send_microphone_data_ts(const int16_t intensity1, const int16_t intensity2, const int16_t intensity3)
-	{
-	    unique_lock<mutex> lock(threadsafety);
-
-	    send_microphone_data(intensity1, intensity2, intensity3);
 	}
 
 	static void issue_motors_command_ts(const int16_t power_left, const int16_t power_right)
@@ -57,6 +57,13 @@ public:
 	    receive_motors_command(power_left, power_right);
 	}
 
+	static void send_distance_ts(const int16_t distance)
+	{
+			unique_lock<mutex> lock(threadsafety);
+
+			send_distance(distance);
+	}
+
 	static void request_distance_ts(int16_t* distance)
 	{
 		unique_lock<mutex> lock(threadsafety);
@@ -64,11 +71,18 @@ public:
 	    request_distance(distance);
 	}
 
-	static void send_distance_ts(const int16_t distance)
+	static void send_sound_data_ts(const int16_t frequency, const int16_t duration)
 	{
 	    unique_lock<mutex> lock(threadsafety);
 
-	    send_distance(distance);
+	    send_sound_data(frequency, duration);
+	}
+
+	static void receive_sound_data_ts(int16_t* frequency, int16_t* duration)
+	{
+		unique_lock<mutex> lock(threadsafety);
+
+	    receive_sound_data(frequency, duration);
 	}
 
 	static void request_accelerometer_data_ts(int16_t *ax, int16_t *ay, int16_t *az)

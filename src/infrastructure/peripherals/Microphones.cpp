@@ -12,7 +12,7 @@
 namespace infrastructure
 {
 
-void Microphones::get_intensities(float *intensity1, float *intensity2, float *intensity3)
+void Microphones::get_intensities(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3)
 {
     int16_t int_intensity1, int_intensity2, int_intensity3;
 
@@ -22,11 +22,11 @@ void Microphones::get_intensities(float *intensity1, float *intensity2, float *i
     *intensity2 = CONVERSION_FACTOR * int_intensity2;
     *intensity3 = CONVERSION_FACTOR * int_intensity3;
 	*/
-	
+
   *intensity1 = int_intensity1;
   *intensity2 = int_intensity2;
   *intensity3 = int_intensity3;
-  
+
 
 }
 

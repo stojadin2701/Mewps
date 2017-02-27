@@ -13,13 +13,21 @@
 const int16_t MICROPHONE_REQUEST = 0;
 const int16_t MOTORS_COMMAND = 1;
 const int16_t DISTANCE_REQUEST = 2;
-const int16_t ACCELEROMETER_REQUEST = 3;
-const int16_t POWER_STATUS_REQUEST = 4;
+const int16_t PLAY_SOUND = 3;
+const int16_t ACCELEROMETER_REQUEST = 4;
+const int16_t POWER_STATUS_REQUEST = 5;
 
 // Protocol wrappers
 inline int16_t receive_preamble()
 {
     return serial_comm_receive();
+}
+
+inline void send_microphone_data(const int16_t intensity1, const int16_t intensity2, const int16_t intensity3)
+{
+    serial_comm_send(intensity1);
+    serial_comm_send(intensity2);
+    serial_comm_send(intensity3);
 }
 
 inline void request_microphone_data(int16_t* intensity1, int16_t* intensity2, int16_t* intensity3)
@@ -30,12 +38,6 @@ inline void request_microphone_data(int16_t* intensity1, int16_t* intensity2, in
     *intensity3 = serial_comm_receive();
 }
 
-inline void send_microphone_data(const int16_t intensity1, const int16_t intensity2, const int16_t intensity3)
-{
-    serial_comm_send(intensity1);
-    serial_comm_send(intensity2);
-    serial_comm_send(intensity3);
-}
 
 inline void issue_motors_command(const int16_t power_left, const int16_t power_right)
 {
@@ -50,15 +52,26 @@ inline void receive_motors_command(int16_t* power_left, int16_t* power_right)
     *power_right = serial_comm_receive();
 }
 
+inline void send_distance(const int16_t distance)
+{
+    serial_comm_send(distance);
+}
+
 inline void request_distance(int16_t* distance)
 {
     serial_comm_send(DISTANCE_REQUEST);
     *distance = serial_comm_receive();
 }
 
-inline void send_distance(const int16_t distance)
-{
-    serial_comm_send(distance);
+inline void send_sound_data(const int16_t frequency, const int16_t duration){
+  serial_comm_send(PLAY_SOUND);
+  serial_comm_send(frequency);
+  serial_comm_send(duration);
+}
+
+inline void receive_sound_data(int16_t* frequency, int16_t* duration){
+  *frequency = serial_comm_receive();
+  *duration = serial_comm_receive();
 }
 
 inline void request_accelerometer_data(int16_t *ax, int16_t *ay, int16_t *az)
