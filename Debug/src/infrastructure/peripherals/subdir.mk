@@ -10,7 +10,8 @@ CPP_SRCS += \
 ../src/infrastructure/peripherals/DistanceSensor.cpp \
 ../src/infrastructure/peripherals/Microphones.cpp \
 ../src/infrastructure/peripherals/Motors.cpp \
-../src/infrastructure/peripherals/PowerSupply.cpp 
+../src/infrastructure/peripherals/PowerSupply.cpp \
+../src/infrastructure/peripherals/Speaker.cpp 
 
 OBJS += \
 ./src/infrastructure/peripherals/Accelerometer.o \
@@ -19,7 +20,8 @@ OBJS += \
 ./src/infrastructure/peripherals/DistanceSensor.o \
 ./src/infrastructure/peripherals/Microphones.o \
 ./src/infrastructure/peripherals/Motors.o \
-./src/infrastructure/peripherals/PowerSupply.o 
+./src/infrastructure/peripherals/PowerSupply.o \
+./src/infrastructure/peripherals/Speaker.o
 
 CPP_DEPS += \
 ./src/infrastructure/peripherals/Accelerometer.d \
@@ -28,7 +30,8 @@ CPP_DEPS += \
 ./src/infrastructure/peripherals/DistanceSensor.d \
 ./src/infrastructure/peripherals/Microphones.d \
 ./src/infrastructure/peripherals/Motors.d \
-./src/infrastructure/peripherals/PowerSupply.d 
+./src/infrastructure/peripherals/PowerSupply.d \
+./src/infrastructure/peripherals/Speaker.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

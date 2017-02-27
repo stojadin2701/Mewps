@@ -13,8 +13,9 @@
 const int16_t MICROPHONE_REQUEST = 0;
 const int16_t MOTORS_COMMAND = 1;
 const int16_t DISTANCE_REQUEST = 2;
-const int16_t ACCELEROMETER_REQUEST = 3;
-const int16_t POWER_STATUS_REQUEST = 4;
+const int16_t PLAY_SOUND = 3;
+const int16_t ACCELEROMETER_REQUEST = 4;
+const int16_t POWER_STATUS_REQUEST = 5;
 
 // Protocol wrappers
 inline int16_t receive_preamble()

@@ -8,6 +8,9 @@ using infrastructure::DistanceSensor;
 #include "infrastructure/peripherals/Motors.h"
 using infrastructure::Motors;
 
+#include "infrastructure/peripherals/Speaker.h"
+using infrastructure::Speaker;
+
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -168,7 +171,9 @@ int main()
 					break;
 				case NONE:
 					cout << "cry :\'(" << endl;
-					Speaker::play_sound(300, 1000);
+					int16_t frequency = 300;
+					int16_t duration = 1000;
+					Speaker::play_sound(frequency, duration);
 					sleep_for(milliseconds(500));
 					break;
 			}

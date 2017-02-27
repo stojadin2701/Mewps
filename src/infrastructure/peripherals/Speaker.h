@@ -1,7 +1,7 @@
 #ifndef INFRASTRUCTURE_PERIPHERALS_SPEAKER_H_
 #define INFRASTRUCTURE_PERIPHERALS_SPEAKER_H_
 
-#include <cstdint>
+#include <stdint.h>
 
 namespace infrastructure
 {
