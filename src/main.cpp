@@ -168,6 +168,7 @@ int main()
 					break;
 				case NONE:
 					cout << "cry :\'(" << endl;
+					Speaker::play_sound(300, 1000);
 					sleep_for(milliseconds(500));
 					break;
 			}

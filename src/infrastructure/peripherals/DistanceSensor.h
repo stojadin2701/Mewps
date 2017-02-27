@@ -23,6 +23,7 @@ public:
 
 private:
 
+	 DistanceSensor() = delete;
    // static constexpr float CONVERSION_FACTOR = 0.001;
 
 };

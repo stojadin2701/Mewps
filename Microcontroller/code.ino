@@ -14,8 +14,11 @@ const unsigned MIC_PINS[] = {A0, A1, A2};
 const unsigned sample_window = 50;
 
 //Trigger and Echo pins for the distance sensor
-const int trig_pin = 2;
-const int echo_pin = A5;
+const unsigned trig_pin = 2;
+const unsigned echo_pin = A5;
+
+//Speaker output pin
+const unsigned SPEAKER_PIN = 3;
 
 long microsecondsToCentimeters(long microseconds){
 	return microseconds/29/2;
@@ -212,6 +215,11 @@ void setup()
 	Serial.begin(BAUD_RATE);
 }
 
+inline void play_sound(int16_t frequency, int16_t duration, bool freeze_while_playing){
+	tone(SPEAKER_PIN, frequency, duration);
+	if(freeze_while_playing) delay(1+duration);
+}
+
 void loop()
 {
 	int16_t preamble = receive_preamble();
@@ -247,6 +255,16 @@ void loop()
 
 				break;
 			}
+			case PLAY_SOUND:
+				{
+					int16_t frequency;
+					int16_t duration;
+
+					receive_sound_data(&frequency, &duration);
+					play_sound(frequency, duration, false);
+
+					break;
+				}
 		case ACCELEROMETER_REQUEST:
 			{
 				int16_t ax;
