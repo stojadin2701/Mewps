@@ -34,7 +34,7 @@ mutex stop, complete, forward;
 condition_variable cv;
 
 bool kill = false; //kill recoveryThread
-bool forward = false; //going forward
+bool going_forward = false;
 bool ready = true; //ready to listen
 
 enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
@@ -62,13 +62,13 @@ void turn_left(int16_t duration){
 
 void go_forward(int16_t duration){
 	unique_lock<mutex> lock_forward(forward);
-	forward = true;
+	going_forward = true;
 	lock_forward.unlock();
 	Motors::set_powers(0.5, 0.5);
 	sleep_for(milliseconds(duration));
 	Motors::set_powers(0, 0);
 	lock_forward.lock();
-	forward = false;
+	going_forward = false;
 	lock_forward.unlock();
 }
 
@@ -109,7 +109,7 @@ void distanceThread(){
 		distance = DistanceSensor::get_distance();
 		cout << "Distance: " << distance << endl;
 		unique_lock<mutex> lock_forward(forward);
-		if(distance<=20 && forward == true){
+		if(distance<=20 && going_forward == true){
 			lock_forward.unlock();
 			Motors::set_powers(0,0);
 			unique_lock<mutex> lock_stop(stop);
