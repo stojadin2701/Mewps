@@ -30,10 +30,11 @@ using std::mutex;
 using std::unique_lock;
 using std::condition_variable;
 
-mutex stop, complete;
+mutex stop, complete, forward;
 condition_variable cv;
 
-bool kill = false;//kill recoveryThread
+bool kill = false; //kill recoveryThread
+bool forward = false; //going forward
 bool ready = true; //ready to listen
 
 enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
@@ -41,19 +42,44 @@ enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
 //std::atomic<Direction> sound_direction {NONE};
 Direction sound_direction = NONE;
 
+void go_reverse(int16_t duration){
+	Motors::set_powers(-0.5,-0.5);
+	sleep_for(milliseconds(duration));
+	Motors::set_powers(0, 0);
+}
+
+void turn_right(int16_t duration){
+	Motors::set_powers(0.75, -0.8);
+	sleep_for(milliseconds(duration));
+	Motors::set_powers(0, 0);
+}
+
+void turn_left(int16_t duration){
+	Motors::set_powers(-0.8, 0.65);
+	sleep_for(milliseconds(duration));
+	Motors::set_powers(0,0);
+}
+
+void go_forward(int16_t duration){
+	unique_lock<mutex> lock_forward(forward);
+	forward = true;
+	lock_forward.unlock();
+	Motors::set_powers(0.5, 0.5);
+	sleep_for(milliseconds(duration));
+	Motors::set_powers(0, 0);
+	lock_forward.lock();
+	forward = false;
+	lock_forward.unlock();
+}
+
 void recoveryThread(){
 	bool check;
 	cout<<"RECOVERING"<<endl;
-	Motors::set_powers(-0.5,-0.5);
-	sleep_for(milliseconds(1000));
-	Motors::set_powers(0,0);
+	go_reverse(1000);
 	sleep_for(milliseconds(300));
-	Motors::set_powers(0.75, -0.8);
-	sleep_for(milliseconds(1000));
-	Motors::set_powers(0, 0);
+	turn_right(1000);
 	sleep_for(milliseconds(500));
-	Motors::set_powers(0.5, 0.5);
-	sleep_for(milliseconds(1000));
+	go_forward(1000);
 	//kill
 	unique_lock<mutex> lock_stop(stop);
 	check = kill;
@@ -62,9 +88,7 @@ void recoveryThread(){
 	if(!check){
 		Motors::set_powers(0,0);
 		sleep_for(milliseconds(500));
-		Motors::set_powers(-0.8, 0.65);
-		sleep_for(milliseconds(1000));
-		Motors::set_powers(0,0);
+		turn_left(1000);
 		cout<<"RECOVERY COMPLETE"<<endl;
 		//set atomic bool
 		unique_lock<mutex> lock_complete(complete);
@@ -84,8 +108,9 @@ void distanceThread(){
 	for(int i=0; i<200; i++){
 		distance = DistanceSensor::get_distance();
 		cout << "Distance: " << distance << endl;
-
-		if(distance<=20){
+		unique_lock<mutex> lock_forward(forward);
+		if(distance<=20 && forward == true){
+			lock_forward.unlock();
 			Motors::set_powers(0,0);
 			unique_lock<mutex> lock_stop(stop);
 			kill = true; //kill recoveryThread if exists
@@ -98,7 +123,9 @@ void distanceThread(){
 			thread recThread(recoveryThread);
 			recThread.detach();
 		}
-
+		else{
+			lock_forward.unlock();
+		}
 		sleep_for(milliseconds(35));
 	}
 }
@@ -130,57 +157,39 @@ int main()
 	try
 	{
 		for(int k=0; k<10; k++){
-			//for(int i=0; i<30; i++){
 			int16_t f1, f2, f3;
 			sleep_for(milliseconds(2000));
-
 			unique_lock<mutex> lock_complete(complete);
 			cv.wait(lock_complete, []{return ready;});
 			lock_complete.unlock();
 			cout<<"LISTENING"<<endl;
-
-
 			Microphones::get_intensities(&f1, &f2, &f3);
 			cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
 			sound_direction = calculate_direction(f1, f2, f3);
 			switch(sound_direction){
 				case FRONT:
 					cout<<"FRONT"<<endl;
-					Motors::set_powers(0.5,0.5);
-					sleep_for(milliseconds(1500));
-					Motors::set_powers(0,0);
+					go_forward(1500);
 					break;
 				case RIGHT:
 					cout<<"RIGHT"<<endl;
-
-					Motors::set_powers(0.75, -0.8);
-					sleep_for(milliseconds(1000));
-					Motors::set_powers(0, 0);
+					turn_right(1000);
 					break;
 				case LEFT:
 					cout<<"LEFT"<<endl;
-					Motors::set_powers(-0.8, 0.65);
-					sleep_for(milliseconds(1000));
-					Motors::set_powers(0,0);
+					turn_left(1000);
 					break;
 				case FRONT_SHORT:
 					cout<<"FRONT_SHORT"<<endl;
-					Motors::set_powers(0.5, 0.5);
-					sleep_for(milliseconds(800));
-					Motors::set_powers(0, 0);
+					go_forward(800);
 					break;
 				case NONE:
 					cout << "cry :\'(" << endl;
-					int16_t frequency = 300;
-					int16_t duration = 1000;
-					Speaker::play_sound(frequency, duration);
+					Speaker::play_sound(300, 1000);
 					sleep_for(milliseconds(500));
 					break;
 			}
-
-
 		}
-
 		}
 		catch (exception &e)
 		{
@@ -191,4 +200,3 @@ int main()
 		Motors::set_powers(0,0);
 		return 0;
 	}
-
