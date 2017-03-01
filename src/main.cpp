@@ -86,6 +86,7 @@ void recoveryThread(){
 	turn_right(1000);
 	sleep_for(milliseconds(500));
 	go_forward(1000);
+	sleep_for(milliseconds(500));
 	//kill
 	unique_lock<mutex> lock_stop(stop);
 	check = kill;
