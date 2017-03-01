@@ -5,10 +5,10 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-cd Microcontroller
-rm -f bin/code.*
-make all && make up
-cd ..
+#cd Microcontroller
+#rm -f bin/code.*
+#make all && make up
+#cd ..
 
 cd Debug
 rm -f Mewps

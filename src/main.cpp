@@ -110,6 +110,7 @@ void distanceThread(){
 		cout << "Distance: " << distance << endl;
 		unique_lock<mutex> lock_forward(forward);
 		if(distance<=20 && going_forward == true){
+			cout << "OBSTACLE DETECTED" << endl;
 			lock_forward.unlock();
 			Motors::set_powers(0,0);
 			unique_lock<mutex> lock_stop(stop);
@@ -121,7 +122,6 @@ void distanceThread(){
 			lock_complete.unlock();
 
 			thread recThread(recoveryThread);
-			recThread.detach();
 
 			Speaker::play_sound(4000, 50);
 			sleep_for(milliseconds(70));
@@ -130,6 +130,10 @@ void distanceThread(){
 			Speaker::play_sound(4000, 50);
 			sleep_for(milliseconds(70));
 			Speaker::play_sound(4000, 50);
+
+
+			recThread.detach();
+
 		}
 		else{
 			lock_forward.unlock();
