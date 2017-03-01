@@ -26,9 +26,13 @@ using std::chrono::milliseconds;
 
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 using std::mutex;
 using std::unique_lock;
 using std::condition_variable;
+using std::atomic;
+
+atomic<bool> program_terminated(false);
 
 mutex stop, complete, forward;
 condition_variable cv;
@@ -122,8 +126,11 @@ void distanceThread(){
 			if(recovery_counter++ > 0)
 					kill = true; //kill recoveryThread if exists
 			if(recovery_counter > 4 ){
+				  Motors::set_powers(0,0);
 					cout<<"RUNNING IN CIRCLES!"<<endl;
-					exit(EXIT_FAILURE);
+					lock_stop.unlock();
+					program_terminated.store(true);
+					break;
 			}
 			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter<< endl;
 			lock_stop.unlock();
@@ -179,7 +186,7 @@ int main()
 
 	try
 	{
-		for(int k=0; k<10; k++){
+		for(int k=0; k<10 && !program_terminated.load(); k++){
 			int16_t f1, f2, f3;
 			sleep_for(milliseconds(2000));
 			unique_lock<mutex> lock_complete(complete);
