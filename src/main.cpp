@@ -49,18 +49,21 @@ enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
 Direction sound_direction = NONE;
 
 void go_reverse(int16_t duration){
+	cout<<"GOING BACKWARDS"<<endl;
 	Motors::set_powers(-0.5,-0.5);
 	sleep_for(milliseconds(duration));
 	Motors::set_powers(0, 0);
 }
 
 void turn_right(int16_t duration){
+	cout<<"TURNING RIGHT"<<endl;
 	Motors::set_powers(0.75, -0.8);
 	sleep_for(milliseconds(duration));
 	Motors::set_powers(0, 0);
 }
 
 void turn_left(int16_t duration){
+	cout<<"TURNING LEFT"<<endl;
 	Motors::set_powers(-0.8, 0.65);
 	sleep_for(milliseconds(duration));
 	Motors::set_powers(0,0);
@@ -70,10 +73,14 @@ void go_forward(int16_t duration){
 	unique_lock<mutex> lock_forward(forward);
 	going_forward = true;
 	lock_forward.unlock();
+	cout<<"GOING FORWARD"<<endl;
 	Motors::set_powers(0.5, 0.5);
 	sleep_for(milliseconds(duration));
-	Motors::set_powers(0, 0);
 	lock_forward.lock();
+	if(going_forward){
+		cout<<"SUCCESSFULLY FINISHED FORWARD MOVEMENT"<<endl;
+		Motors::set_powers(0, 0);
+	}
 	going_forward = false;
 	lock_forward.unlock();
 }
@@ -131,6 +138,10 @@ void distanceThread(){
 					cout<<"RUNNING IN CIRCLES!"<<endl;
 					lock_stop.unlock();
 					program_terminated.store(true);
+					unique_lock<mutex> lock_complete(complete);
+					ready = true;
+					lock_complete.unlock();
+					cv.notify_one();
 					break;
 			}
 			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter<< endl;
@@ -193,13 +204,17 @@ int main()
 			unique_lock<mutex> lock_complete(complete);
 			cv.wait(lock_complete, []{return ready;});
 			lock_complete.unlock();
+			if(program_terminated.load()){
+				cout<<"GOODBYE CRUEL WORLD!"<<endl;
+				break;
+			}
 			cout<<"LISTENING"<<endl;
 			Microphones::get_intensities(&f1, &f2, &f3);
 			cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
 			sound_direction = calculate_direction(f1, f2, f3);
 			switch(sound_direction){
 				case FRONT:
-					cout<<"FRONT"<<endl;
+					cout<<"HEARING FRONT"<<endl;
 					/*
 					Speaker::play_sound(2000, 100);
 					sleep_for(milliseconds(140));
@@ -210,7 +225,7 @@ int main()
 					go_forward(1500);
 					break;
 				case RIGHT:
-					cout<<"RIGHT"<<endl;
+					cout<<"HEARING RIGHT"<<endl;
 					/*
 					Speaker::play_sound(1000, 250);
 					sleep_for(milliseconds(280));
@@ -219,14 +234,14 @@ int main()
 					turn_right(1000);
 					break;
 				case LEFT:
-					cout<<"LEFT"<<endl;
+					cout<<"HEARING LEFT"<<endl;
 					/*
 					Speaker::play_sound(500, 500);
 					*/
 					turn_left(1000);
 					break;
 				case FRONT_SHORT:
-					cout<<"FRONT_SHORT"<<endl;
+					cout<<"HEARING FRONT_SHORT"<<endl;
 					go_forward(800);
 					break;
 				case NONE:
