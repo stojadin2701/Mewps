@@ -122,6 +122,14 @@ void distanceThread(){
 
 			thread recThread(recoveryThread);
 			recThread.detach();
+
+			Speaker::play_sound(4000, 50);
+			sleep_for(milliseconds(70));
+			Speaker::play_sound(4000, 50);
+			sleep_for(milliseconds(70));
+			Speaker::play_sound(4000, 50);
+			sleep_for(milliseconds(70));
+			Speaker::play_sound(4000, 50);
 		}
 		else{
 			lock_forward.unlock();
@@ -169,14 +177,23 @@ int main()
 			switch(sound_direction){
 				case FRONT:
 					cout<<"FRONT"<<endl;
+					Speaker::play_sound(2000, 100);
+					sleep_for(milliseconds(140));
+					Speaker::play_sound(2000, 100);
+					sleep_for(milliseconds(140));
+					Speaker::play_sound(2000, 100);
 					go_forward(1500);
 					break;
 				case RIGHT:
 					cout<<"RIGHT"<<endl;
+					Speaker::play_sound(1000, 250);
+					sleep_for(milliseconds(280));
+					Speaker::play_sound(1000, 250);
 					turn_right(1000);
 					break;
 				case LEFT:
 					cout<<"LEFT"<<endl;
+					Speaker::play_sound(500, 500);
 					turn_left(1000);
 					break;
 				case FRONT_SHORT:
@@ -185,7 +202,7 @@ int main()
 					break;
 				case NONE:
 					cout << "cry :\'(" << endl;
-					Speaker::play_sound(300, 1000);
+					Speaker::play_sound(300, 1500);
 					sleep_for(milliseconds(500));
 					break;
 			}

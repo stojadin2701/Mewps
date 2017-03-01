@@ -1,7 +1,7 @@
 #include "../src/infrastructure/peripherals/hardware/serial_comm.h"
 #include "../src/infrastructure/peripherals/comm_protocol.h"
 
-#define DISTANCE_SAMPLING_NUM 5
+#define DISTANCE_SAMPLING_NUM 3
 #define MIC_SAMPLING_NUM 3
 
 // Motor enable pins
