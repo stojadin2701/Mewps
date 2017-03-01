@@ -152,9 +152,6 @@ void distanceThread(){
 			recThread.detach();
 
 		}
-		else{
-			lock_forward.unlock();
-		}
 		sleep_for(milliseconds(35));
 	}
 }
