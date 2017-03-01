@@ -33,6 +33,8 @@ using std::condition_variable;
 mutex stop, complete, forward;
 condition_variable cv;
 
+int recovery_counter = 0;
+
 bool kill = false; //kill recoveryThread
 bool going_forward = false;
 bool ready = true; //ready to listen
@@ -99,6 +101,9 @@ void recoveryThread(){
 	else {
 		cout << "RECOVERY KILLED" << endl;
 	}
+	lock_stop.lock();
+	recovery_counter--;
+	lock_stop.unlock();
 }
 
 
@@ -111,10 +116,13 @@ void distanceThread(){
 		unique_lock<mutex> lock_forward(forward);
 		if(distance<=20 && going_forward == true){
 			cout << "OBSTACLE DETECTED" << endl;
+			going_forward = false;
 			lock_forward.unlock();
 			Motors::set_powers(0,0);
 			unique_lock<mutex> lock_stop(stop);
-			kill = true; //kill recoveryThread if exists
+			if(recovery_counter++ > 0)
+					kill = true; //kill recoveryThread if exists
+			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter<< endl;	
 			lock_stop.unlock();
 
 			unique_lock<mutex> lock_complete(complete);
