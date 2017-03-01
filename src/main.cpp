@@ -123,7 +123,7 @@ void distanceThread(){
 					kill = true; //kill recoveryThread if exists
 			if(recovery_counter > 4 ){
 					cout<<"RUNNING IN CIRCLES!"<<endl;
-					System.exit(0);
+					exit(EXIT_FAILURE);
 			}
 			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter<< endl;
 			lock_stop.unlock();
