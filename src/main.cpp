@@ -85,6 +85,8 @@ void recoveryThread(){
 	//kill
 	unique_lock<mutex> lock_stop(stop);
 	check = kill;
+	if(!check)
+		recovery_counter = 0;
 	kill = false;
 	lock_stop.unlock();
 	if(!check){
@@ -101,9 +103,6 @@ void recoveryThread(){
 	else {
 		cout << "RECOVERY KILLED" << endl;
 	}
-	lock_stop.lock();
-	recovery_counter--;
-	lock_stop.unlock();
 }
 
 
@@ -122,7 +121,11 @@ void distanceThread(){
 			unique_lock<mutex> lock_stop(stop);
 			if(recovery_counter++ > 0)
 					kill = true; //kill recoveryThread if exists
-			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter<< endl;	
+			if(recovery_counter > 4 ){
+					cout<<"RUNNING IN CIRCLES!"<<endl;
+					System.exit(0);
+			}
+			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter<< endl;
 			lock_stop.unlock();
 
 			unique_lock<mutex> lock_complete(complete);
@@ -189,23 +192,29 @@ int main()
 			switch(sound_direction){
 				case FRONT:
 					cout<<"FRONT"<<endl;
+					/*
 					Speaker::play_sound(2000, 100);
 					sleep_for(milliseconds(140));
 					Speaker::play_sound(2000, 100);
 					sleep_for(milliseconds(140));
 					Speaker::play_sound(2000, 100);
+					*/
 					go_forward(1500);
 					break;
 				case RIGHT:
 					cout<<"RIGHT"<<endl;
+					/*
 					Speaker::play_sound(1000, 250);
 					sleep_for(milliseconds(280));
 					Speaker::play_sound(1000, 250);
+					*/
 					turn_right(1000);
 					break;
 				case LEFT:
 					cout<<"LEFT"<<endl;
+					/*
 					Speaker::play_sound(500, 500);
+					*/
 					turn_left(1000);
 					break;
 				case FRONT_SHORT:
