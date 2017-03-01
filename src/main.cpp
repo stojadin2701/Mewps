@@ -33,15 +33,15 @@ using std::condition_variable;
 using std::atomic;
 
 atomic<bool> program_terminated(false);
+atomic<bool> going_forward(false);
+atomic<bool> ready(true); //ready to listen
 
-mutex stop, complete, forward;
+mutex stop, complete;
 condition_variable cv;
 
 int recovery_counter = 0;
 
 bool kill = false; //kill recoveryThread
-bool going_forward = false;
-bool ready = true; //ready to listen
 
 enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
 
@@ -70,19 +70,15 @@ void turn_left(int16_t duration){
 }
 
 void go_forward(int16_t duration){
-	unique_lock<mutex> lock_forward(forward);
-	going_forward = true;
-	lock_forward.unlock();
+	going_forward.store(true);
 	cout<<"GOING FORWARD"<<endl;
 	Motors::set_powers(0.5, 0.5);
 	sleep_for(milliseconds(duration));
-	lock_forward.lock();
-	if(going_forward){
+	if(going_forward.load()){
 		cout<<"SUCCESSFULLY FINISHED FORWARD MOVEMENT"<<endl;
 		Motors::set_powers(0, 0);
 	}
-	going_forward = false;
-	lock_forward.unlock();
+	going_forward.store(false);
 }
 
 void recoveryThread(){
@@ -107,9 +103,7 @@ void recoveryThread(){
 		turn_left(1000);
 		cout<<"RECOVERY COMPLETE"<<endl;
 		//set atomic bool
-		unique_lock<mutex> lock_complete(complete);
-		ready = true;
-		lock_complete.unlock();
+		ready.store(true);
 		cv.notify_one();
 	}
 	else {
@@ -124,11 +118,9 @@ void distanceThread(){
 	for(int i=0; i<200; i++){
 		distance = DistanceSensor::get_distance();
 		cout << "Distance: " << distance << endl;
-		unique_lock<mutex> lock_forward(forward);
-		if(distance<=20 && going_forward == true){
+		if(distance<=20 && going_forward.load()){
 			cout << "OBSTACLE DETECTED" << endl;
-			going_forward = false;
-			lock_forward.unlock();
+			going_forward.store(false);
 			Motors::set_powers(0,0);
 			unique_lock<mutex> lock_stop(stop);
 			if(recovery_counter++ > 0)
@@ -138,18 +130,13 @@ void distanceThread(){
 					cout<<"RUNNING IN CIRCLES!"<<endl;
 					lock_stop.unlock();
 					program_terminated.store(true);
-					unique_lock<mutex> lock_complete(complete);
-					ready = true;
-					lock_complete.unlock();
+					ready.store(true);
 					cv.notify_one();
 					break;
 			}
 			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter<< endl;
 			lock_stop.unlock();
-
-			unique_lock<mutex> lock_complete(complete);
-			ready = false;
-			lock_complete.unlock();
+			ready.store(false);
 
 			thread recThread(recoveryThread);
 
@@ -202,7 +189,7 @@ int main()
 			int16_t f1, f2, f3;
 			sleep_for(milliseconds(2000));
 			unique_lock<mutex> lock_complete(complete);
-			cv.wait(lock_complete, []{return ready;});
+			cv.wait(lock_complete, []{return ready.load();});
 			lock_complete.unlock();
 			if(program_terminated.load()){
 				cout<<"GOODBYE CRUEL WORLD!"<<endl;
