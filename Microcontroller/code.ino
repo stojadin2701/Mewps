@@ -157,8 +157,8 @@ inline void set_motors_power(int16_t power_left, int16_t power_right){
 
 inline void read_distance(int16_t *distance){
 	long duration, cm;
-	long sum=0;
-	int16_t avg=0;
+	long sum = 0;
+	int16_t avg = 0;
 
 	for(int i=0; i<DISTANCE_SAMPLING_NUM; i++){
 		pinMode(trig_pin, OUTPUT);

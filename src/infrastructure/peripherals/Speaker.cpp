@@ -9,7 +9,7 @@ namespace infrastructure
 
 void Speaker::play_sound(int16_t frequency, int16_t duration)
 {
-    if(frequency<0 || duration < 0){
+    if(frequency < 0 || duration < 0){
       throw InvalidSpeakerValuesError(frequency, duration);
     }
 

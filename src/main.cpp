@@ -185,13 +185,11 @@ void distance_thread(){
 	}
 }
 
-int main()
-{
+int main(){
 	sleep_for(milliseconds(2000));
 	cout << "STARTING..." << endl;
 	thread dis_thread(distance_thread);
-	try
-	{
+	try{
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
 			int16_t f1, f2, f3;
 			sleep_for(milliseconds(2000));
@@ -251,8 +249,7 @@ int main()
 		play_death_song();
 		cout<<"SHUTTING DOWN..."<<endl;
 		}
-		catch (exception &e)
-		{
+		catch (exception &e){
 			cout << e.what() << endl;
 			Motors::set_powers(0,0);
 		}

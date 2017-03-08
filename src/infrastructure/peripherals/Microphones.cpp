@@ -1,10 +1,3 @@
-/*
- * Microphones.cpp
- *
- *  Created on: Jan 24, 2017
- *      Author: schutzekatze
- */
-
 #include "Microphones.h"
 
 #include "CommProtocolThreadsafe.h"

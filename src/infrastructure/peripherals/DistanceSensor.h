@@ -1,10 +1,3 @@
-/*
- * DistanceSensor.h
- *
- *  Created on: Jan 24, 2017
- *      Author: schutzekatze
- */
-
 #ifndef INFRASTRUCTURE_PERIPHERALS_DISTANCESENSOR_H_
 #define INFRASTRUCTURE_PERIPHERALS_DISTANCESENSOR_H_
 

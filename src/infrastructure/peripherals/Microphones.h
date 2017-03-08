@@ -1,10 +1,3 @@
-/*
- * Microphones.h
- *
- *  Created on: Jan 24, 2017
- *      Author: schutzekatze
- */
-
 #ifndef INFRASTRUCTURE_PERIPHERALS_MICROPHONES_H_
 #define INFRASTRUCTURE_PERIPHERALS_MICROPHONES_H_
 

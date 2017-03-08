@@ -1,10 +1,3 @@
-/*
- * DistanceSensor.cpp
- *
- *  Created on: Jan 24, 2017
- *      Author: schutzekatze
- */
-
 #include <stdint.h>
 #include "DistanceSensor.h"
 
