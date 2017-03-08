@@ -35,6 +35,8 @@ using std::atomic;
 #define DISTANCE_THRESHOLD 20
 #define LISTENING_NUM 10
 
+#define TURN_DURATION 700
+
 atomic<bool> program_terminated(false);
 //indicates whether both motors are going forward
 atomic<bool> going_forward(false);
@@ -71,7 +73,7 @@ Direction calculate_direction(int16_t i1, int16_t i2, int16_t i3) {
 
 void go_reverse(int16_t duration){
 	cout<<"GOING BACKWARDS"<<endl;
-	Motors::set_powers(-0.5,-0.5);
+	Motors::set_powers(-0.45,-0.45);
 	sleep_for(milliseconds(duration));
 	Motors::set_powers(0, 0);
 }
@@ -85,7 +87,7 @@ void turn_right(int16_t duration){
 
 void turn_left(int16_t duration){
 	cout<<"TURNING LEFT"<<endl;
-	Motors::set_powers(-0.8, 0.65);
+	Motors::set_powers(-0.8, 0.75);
 	sleep_for(milliseconds(duration));
 	Motors::set_powers(0,0);
 }
@@ -93,7 +95,7 @@ void turn_left(int16_t duration){
 void go_forward(int16_t duration){
 	going_forward.store(true);
 	cout<<"GOING FORWARD"<<endl;
-	Motors::set_powers(0.5, 0.5);
+	Motors::set_powers(0.45, 0.45);
 	sleep_for(milliseconds(duration));
 	if(going_forward.load()){
 		cout<<"SUCCESSFULLY FINISHED FORWARD MOVEMENT"<<endl;
@@ -110,12 +112,12 @@ void play_death_song(){
 	Speaker::play_sound(300, 2000);
 }
 
-void recoveryThread(){
+void recovery_thread(){
 	bool check;
 	cout<<"RECOVERING"<<endl;
 	go_reverse(1000);
 	sleep_for(milliseconds(300));
-	turn_right(1000);
+	turn_right(TURN_DURATION);
 	sleep_for(milliseconds(500));
 	go_forward(1000);
 	sleep_for(milliseconds(500));
@@ -128,7 +130,7 @@ void recoveryThread(){
 	if(!check){
 		Motors::set_powers(0,0);
 		sleep_for(milliseconds(500));
-		turn_left(1000);
+		turn_left(TURN_DURATION);
 		cout<<"RECOVERY COMPLETE"<<endl;
 		ready.store(true);
 		cv.notify_one();
@@ -138,7 +140,7 @@ void recoveryThread(){
 	}
 }
 
-void distanceThread(){
+void distance_thread(){
 	int16_t distance;
 	while(!listening_ended.load() || (recovery_counter.load() > 0)){
 		distance = DistanceSensor::get_distance();
@@ -167,7 +169,7 @@ void distanceThread(){
 			lock_stop.unlock();
 			ready.store(false);
 
-			thread recThread(recoveryThread);
+			thread rec_thread(recovery_thread);
 
 			Speaker::play_sound(4000, 50);
 			sleep_for(milliseconds(70));
@@ -177,7 +179,7 @@ void distanceThread(){
 			sleep_for(milliseconds(70));
 			Speaker::play_sound(4000, 50);
 
-			recThread.detach();
+			rec_thread.detach();
 		}
 		sleep_for(milliseconds(35));
 	}
@@ -187,7 +189,7 @@ int main()
 {
 	sleep_for(milliseconds(2000));
 	cout << "STARTING..." << endl;
-	thread disThread(distanceThread);
+	thread dis_thread(distance_thread);
 	try
 	{
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
@@ -200,7 +202,7 @@ int main()
 				cout<<"GOODBYE CRUEL WORLD!"<<endl;
 				break;
 			}
-			cout<<"LISTENING"<<endl;
+			cout<<"LISTENING ("<< k+1 << ")" << endl;
 			Microphones::get_intensities(&f1, &f2, &f3);
 			cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
 			sound_direction = calculate_direction(f1, f2, f3);
@@ -214,7 +216,7 @@ int main()
 					sleep_for(milliseconds(140));
 					Speaker::play_sound(2000, 100);
 					*/
-					go_forward(1500);
+					go_forward(1400);
 					break;
 				case RIGHT:
 					cout<<"HEARING RIGHT"<<endl;
@@ -223,18 +225,18 @@ int main()
 					sleep_for(milliseconds(280));
 					Speaker::play_sound(1000, 250);
 					*/
-					turn_right(1000);
+					turn_right(TURN_DURATION);
 					break;
 				case LEFT:
 					cout<<"HEARING LEFT"<<endl;
 					/*
 					Speaker::play_sound(500, 500);
 					*/
-					turn_left(1000);
+					turn_left(TURN_DURATION);
 					break;
 				case FRONT_SHORT:
 					cout<<"HEARING FRONT_SHORT"<<endl;
-					go_forward(800);
+					go_forward(750);
 					break;
 				case NONE:
 					cout << "DIRECTION NOT DETERMINED :\'(" << endl;
@@ -244,7 +246,7 @@ int main()
 			}
 		}
 		listening_ended.store(true);
-		disThread.join();
+		dis_thread.join();
 		Motors::set_powers(0,0);
 		play_death_song();
 		cout<<"SHUTTING DOWN..."<<endl;
