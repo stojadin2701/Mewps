@@ -38,16 +38,16 @@ using std::atomic;
 #define TURN_DURATION 700
 
 atomic<bool> program_terminated(false);
-//indicates whether both motors are going forward
+//Indicates whether both motors are going forward
 atomic<bool> going_forward(false);
-//ready to listen
+//Ready to listen
 atomic<bool> ready(true);
 atomic<bool> listening_ended(false);
 
 mutex stop, complete;
 condition_variable cv;
 
-//number of currently active recovery threads
+//Number of currently active recovery threads
 atomic<int> recovery_counter(0);
 
 bool kill = false;
@@ -150,10 +150,10 @@ void distance_thread(){
 			going_forward.store(false);
 			Motors::set_powers(0,0);
 			unique_lock<mutex> lock_stop(stop);
-			//killing the previous recovery thread if an obstacle is detected while recovering
+			//Killing the previous recovery thread if an obstacle is detected while recovering
 			int rec_num = recovery_counter.load();
 			if(rec_num++ > 0){
-					kill = true; //kill recoveryThread if exists
+					kill = true;
 			}
 			recovery_counter.store(rec_num);
 			if(recovery_counter.load() > 4){
@@ -254,6 +254,7 @@ int main()
 		catch (exception &e)
 		{
 			cout << e.what() << endl;
+			Motors::set_powers(0,0);
 		}
 		return 0;
 	}
