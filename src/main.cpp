@@ -33,6 +33,7 @@ using std::condition_variable;
 using std::atomic;
 
 #define DISTANCE_THRESHOLD 20
+#define LISTENING_NUM 10
 
 atomic<bool> program_terminated(false);
 //indicates whether both motors are going forward
@@ -102,11 +103,11 @@ void go_forward(int16_t duration){
 }
 
 void play_death_song(){
-	Speaker::play_sound(2000, 500);
-	sleep_for(milliseconds(600));
-	Speaker::play_sound(1000, 500);
-	sleep_for(milliseconds(600));
-	Speaker::play_sound(300, 500);
+	Speaker::play_sound(1500, 1000);
+	sleep_for(milliseconds(1200));
+	Speaker::play_sound(1000, 1000);
+	sleep_for(milliseconds(1200));
+	Speaker::play_sound(300, 2000);
 }
 
 void recoveryThread(){
@@ -189,14 +190,13 @@ int main()
 	thread disThread(distanceThread);
 	try
 	{
-		for(int k=0; k<10 && !program_terminated.load(); k++){
+		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
 			int16_t f1, f2, f3;
 			sleep_for(milliseconds(2000));
 			unique_lock<mutex> lock_complete(complete);
 			cv.wait(lock_complete, []{return ready.load();});
 			lock_complete.unlock();
 			if(program_terminated.load()){
-				play_death_song();
 				cout<<"GOODBYE CRUEL WORLD!"<<endl;
 				break;
 			}
