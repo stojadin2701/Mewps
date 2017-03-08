@@ -32,21 +32,41 @@ using std::unique_lock;
 using std::condition_variable;
 using std::atomic;
 
+#define DISTANCE_THRESHOLD 20
+
 atomic<bool> program_terminated(false);
+//indicates whether both motors are going forward
 atomic<bool> going_forward(false);
-atomic<bool> ready(true); //ready to listen
+//ready to listen
+atomic<bool> ready(true);
+atomic<bool> listening_ended(false);
 
 mutex stop, complete;
 condition_variable cv;
 
-int recovery_counter = 0;
+//number of currently active recovery threads
+atomic<int> recovery_counter(0);
 
-bool kill = false; //kill recoveryThread
+bool kill = false;
 
 enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
 
-//std::atomic<Direction> sound_direction {NONE};
 Direction sound_direction = NONE;
+
+Direction calculate_direction(int16_t i1, int16_t i2, int16_t i3) {
+	Direction dir = NONE;
+	int16_t eps = 2;
+	int16_t threshold = 1;
+
+	if(i1 < threshold && i2 < threshold && i3 < threshold) dir=NONE;
+	else if((i1-eps)>= i2 && (i1-eps)>=i3) dir = FRONT;
+	else if((i2-eps)>= i1 && (i2-eps)>=i3) dir = RIGHT;
+	else if((i3-eps)>= i1 && (i3-eps)>=i2) dir = LEFT;
+	else if((i2+eps)<= i1 && (i2+eps)<=i3) dir = FRONT_SHORT;
+	else if((i3+eps)<= i1 && (i3+eps)<=i2) dir = FRONT_SHORT;
+
+	return dir;
+}
 
 void go_reverse(int16_t duration){
 	cout<<"GOING BACKWARDS"<<endl;
@@ -81,6 +101,14 @@ void go_forward(int16_t duration){
 	going_forward.store(false);
 }
 
+void play_death_song(){
+	Speaker::play_sound(2000, 500);
+	sleep_for(milliseconds(600));
+	Speaker::play_sound(1000, 500);
+	sleep_for(milliseconds(600));
+	Speaker::play_sound(300, 500);
+}
+
 void recoveryThread(){
 	bool check;
 	cout<<"RECOVERING"<<endl;
@@ -90,11 +118,10 @@ void recoveryThread(){
 	sleep_for(milliseconds(500));
 	go_forward(1000);
 	sleep_for(milliseconds(500));
-	//kill
 	unique_lock<mutex> lock_stop(stop);
 	check = kill;
 	if(!check)
-		recovery_counter = 0;
+		recovery_counter.store(0);
 	kill = false;
 	lock_stop.unlock();
 	if(!check){
@@ -102,7 +129,6 @@ void recoveryThread(){
 		sleep_for(milliseconds(500));
 		turn_left(1000);
 		cout<<"RECOVERY COMPLETE"<<endl;
-		//set atomic bool
 		ready.store(true);
 		cv.notify_one();
 	}
@@ -111,21 +137,23 @@ void recoveryThread(){
 	}
 }
 
-
-
 void distanceThread(){
 	int16_t distance;
-	for(int i=0; i<200; i++){
+	while(!listening_ended.load() || (recovery_counter.load() > 0)){
 		distance = DistanceSensor::get_distance();
 		cout << "Distance: " << distance << endl;
-		if(distance<=20 && going_forward.load()){
+		if(distance <= DISTANCE_THRESHOLD && going_forward.load()){
 			cout << "OBSTACLE DETECTED" << endl;
 			going_forward.store(false);
 			Motors::set_powers(0,0);
 			unique_lock<mutex> lock_stop(stop);
-			if(recovery_counter++ > 0)
+			//killing the previous recovery thread if an obstacle is detected while recovering
+			int rec_num = recovery_counter.load();
+			if(rec_num++ > 0){
 					kill = true; //kill recoveryThread if exists
-			if(recovery_counter > 4 ){
+			}
+			recovery_counter.store(rec_num);
+			if(recovery_counter.load() > 4){
 				  Motors::set_powers(0,0);
 					cout<<"RUNNING IN CIRCLES!"<<endl;
 					lock_stop.unlock();
@@ -134,7 +162,7 @@ void distanceThread(){
 					cv.notify_one();
 					break;
 			}
-			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter<< endl;
+			cout << "NUMBER OF RECOVERY THREADS: "<<recovery_counter.load()<< endl;
 			lock_stop.unlock();
 			ready.store(false);
 
@@ -148,38 +176,17 @@ void distanceThread(){
 			sleep_for(milliseconds(70));
 			Speaker::play_sound(4000, 50);
 
-
 			recThread.detach();
-
 		}
 		sleep_for(milliseconds(35));
 	}
 }
 
-
-Direction calculate_direction( int16_t i1, int16_t i2, int16_t i3){
-	Direction dir = NONE;
-	int16_t eps = 2;
-	int16_t threshold = 1;
-
-	if(i1 < threshold && i2 < threshold && i3 < threshold) dir=NONE;
-	else if((i1-eps)>= i2 && (i1-eps)>=i3) dir = FRONT;
-	else if((i2-eps)>= i1 && (i2-eps)>=i3) dir = RIGHT;
-	else if((i3-eps)>= i1 && (i3-eps)>=i2) dir = LEFT;
-	else if((i2+eps)<= i1 && (i2+eps)<=i3) dir = FRONT_SHORT;
-	else if((i3+eps)<= i1 && (i3+eps)<=i2) dir = FRONT_SHORT;
-
-	return dir;
-}
-
 int main()
 {
 	sleep_for(milliseconds(2000));
-
-	cout << "start" << endl;
-
+	cout << "STARTING..." << endl;
 	thread disThread(distanceThread);
-
 	try
 	{
 		for(int k=0; k<10 && !program_terminated.load(); k++){
@@ -189,6 +196,7 @@ int main()
 			cv.wait(lock_complete, []{return ready.load();});
 			lock_complete.unlock();
 			if(program_terminated.load()){
+				play_death_song();
 				cout<<"GOODBYE CRUEL WORLD!"<<endl;
 				break;
 			}
@@ -229,19 +237,21 @@ int main()
 					go_forward(800);
 					break;
 				case NONE:
-					cout << "cry :\'(" << endl;
+					cout << "DIRECTION NOT DETERMINED :\'(" << endl;
 					Speaker::play_sound(300, 1500);
 					sleep_for(milliseconds(500));
 					break;
 			}
 		}
+		listening_ended.store(true);
+		disThread.join();
+		Motors::set_powers(0,0);
+		play_death_song();
+		cout<<"SHUTTING DOWN..."<<endl;
 		}
 		catch (exception &e)
 		{
 			cout << e.what() << endl;
 		}
-
-		disThread.join();
-		Motors::set_powers(0,0);
 		return 0;
 	}

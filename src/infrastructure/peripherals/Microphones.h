@@ -23,7 +23,7 @@ public:
 
 private:
 
-	static constexpr float CONVERSION_FACTOR = 0.1;
+	//static constexpr float CONVERSION_FACTOR = 0.1;
 
 };
 
