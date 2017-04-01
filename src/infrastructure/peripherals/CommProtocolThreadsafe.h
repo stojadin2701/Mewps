@@ -29,6 +29,20 @@ public:
 	    return receive_preamble();
 	}
 
+	static void send_microphone_turn_angle_ts(const int16_t turn_angle)
+	{
+			unique_lock<mutex> lock(threadsafety);
+
+			send_microphone_turn_angle(turn_angle);
+	}
+
+	static void request_microphone_turn_angle_ts(int16_t* turn_angle)
+	{
+	    unique_lock<mutex> lock(threadsafety);
+
+	    request_microphone_turn_angle(turn_angle);
+	}
+
 	static void send_microphone_data_ts(const int16_t intensity1, const int16_t intensity2, const int16_t intensity3)
 	{
 			unique_lock<mutex> lock(threadsafety);

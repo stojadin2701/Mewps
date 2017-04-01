@@ -1,5 +1,3 @@
-#include <math.h>
-#include <limits.h>
 #include "../src/infrastructure/peripherals/hardware/serial_comm.h"
 #include "../src/infrastructure/peripherals/comm_protocol.h"
 
@@ -17,28 +15,11 @@ const unsigned MOTOR_PINS[] = { 5, 6, 9, 10 };
 const unsigned MIC_PINS[] = {A0, A1, A2};
 
 //Trigger and Echo pins for the distance sensor
-const unsigned TRIG_PIN = 2;
-const unsigned ECHO_PIN = A5;
-
-const unsigned RED_PIN = 7;
-const unsigned YELLOW_PIN = 11;
-const unsigned GREEN_PIN = 12;
+const unsigned trig_pin = 2;
+const unsigned echo_pin = A5;
 
 //Speaker output pin
 const unsigned SPEAKER_PIN = 3;
-
-
-const int MICROPHONE_COUNT = 3;
-const float MICROPHONE_DISTANCE = 0.205;
-const float SPEED_OF_SOUND = 340.29 / 1000.0 / 1000.0;
-
-struct Microphone
-{
-  int id;
-  unsigned long delay;
-  float delay_distance;
-};
-
 
 long microsecondsToCentimeters(long microseconds){
 	return microseconds/29/2;
@@ -149,140 +130,6 @@ inline void read_microphone_data(int16_t *intensity1, int16_t *intensity2, int16
 	*intensity3 = i3_sum/MIC_SAMPLING_NUM;
 }
 
-float determine_angle(unsigned long* delays)
-{
-  int main_id;
-  int i;
-  Microphone microphones[MICROPHONE_COUNT];
-
-  for(i = 0; i < MICROPHONE_COUNT; i++)
-  {
-    if (delays[i] == 0)
-    {
-      main_id = i;
-      break;
-    }
-  }
-
-  for(i = 0; i < MICROPHONE_COUNT; i++)
-  {
-    microphones[i].id = (main_id + i) % MICROPHONE_COUNT;
-    microphones[i].delay = delays[microphones[i].id];
-    microphones[i].delay_distance = microphones[i].delay * SPEED_OF_SOUND;
-  }
-
-  float alpha = acos(microphones[1].delay_distance / MICROPHONE_DISTANCE);
-
-  float sign = (microphones[1].delay > microphones[2].delay) ? -1 : 1;
-  float angle = M_PI / 3.0 + sign * alpha;
-  float global_angle = -(M_PI / 2.0 - angle) + 2 * M_PI / 3.0 * main_id;
-  while (global_angle <= -M_PI) global_angle += M_PI * 2;
-  while (global_angle > M_PI) global_angle -= M_PI * 2;
-
-  return global_angle / M_PI * 180.0;
-}
-
-inline void read_microphone_turn_angle(int16_t *turn_angle) {
-  *turn_angle = INT_MAX;
-
-	byte m0, m1, m2;
-  unsigned long t0, t1, t2;
-  unsigned long t_micros;
-
-  unsigned long initial_time;
-  float angles[3];
-	int loop = 0;
-	while(loop < 3) {
-		digitalWrite(RED_PIN, HIGH);
-		digitalWrite(YELLOW_PIN, HIGH);
-		digitalWrite(GREEN_PIN, HIGH);
-	  for(int i = 0; i < 3; i++)
-	  {
-	      m0 = 0; m1 = 0; m2 = 0;
-	      while(!(m0 & m1 & m2))
-	      {
-	        t_micros = micros();
-
-	        if (!m0 && (m0 = digitalRead(A0))) { t0 = t_micros; }
-	        if (!m1 && (m1 = digitalRead(A1))) { t1 = t_micros; }
-	        if (!m2 && (m2 = digitalRead(A2))) { t2 = t_micros; }
-	      }
-
-	      initial_time = t0;
-	      if (t1 < initial_time) initial_time = t1;
-	      if (t2 < initial_time) initial_time = t2;
-
-	      t0 -= initial_time;
-	      t1 -= initial_time;
-	      t2 -= initial_time;
-
-	      unsigned long delays[3] = {t0, t1, t2};
-	      float turn_angle = determine_angle(delays);
-
-	      char print_str[60];
-
-	      if (isnan(turn_angle))
-	      {
-	        i--;
-	      }
-	      else
-	      {
-	        angles[i] = turn_angle;
-
-					switch (i)
-					{
-						case 0: digitalWrite(RED_PIN, LOW); break;
-						case 1: digitalWrite(YELLOW_PIN, LOW); break;
-						case 2: digitalWrite(GREEN_PIN, LOW); break;
-					}
-	      }
-
-	      delay(200);
-	  }
-
-	  float diffs[3], min_diff, max_diff;
-
-	  diffs[0] = fabs(angles[0] - angles[1]);
-	  diffs[1] = fabs(angles[1] - angles[2]);
-	  diffs[2] = fabs(angles[2] - angles[0]);
-
-	  float sum = 0;
-	  int count = 0;
-	  for(int i = 0; i < 3; i++) {
-	    if (diffs[i] <= 45.0) {
-	      sum += angles[i] + angles[(i + 1) % 3];
-	      count += 2;
-	    }
-	  }
-
-	  if (count >= 2) {
-	     sum /= count;
-			 int sign = (sum>=0?1:-1);
-			 sum = fabs(sum);
-	     loop = 3;
-			 *turn_angle = (sign)*(((int)ceil(sum/22.5))/2)*45;
-			 digitalWrite(RED_PIN, HIGH);
-	 		 digitalWrite(YELLOW_PIN, HIGH);
-	 		 digitalWrite(GREEN_PIN, HIGH);
-			 delay(200);
-			 digitalWrite(RED_PIN, LOW);
-	 		 digitalWrite(YELLOW_PIN, LOW);
-	 		 digitalWrite(GREEN_PIN, LOW);
-			 delay(200);
-			 digitalWrite(RED_PIN, HIGH);
-	 		 digitalWrite(YELLOW_PIN, HIGH);
-	 		 digitalWrite(GREEN_PIN, HIGH);
-			 delay(200);
-	  }
-	  else {
-			loop ++;
-	  }
-		digitalWrite(RED_PIN, LOW);
-		digitalWrite(YELLOW_PIN, LOW);
-		digitalWrite(GREEN_PIN, LOW);
-  }
-}
-
 inline void set_motors_power(int16_t power_left, int16_t power_right){
 	if (power_left < -255 || power_left > 255) return;
 	if (power_right < -255 || power_right > 255) return;
@@ -314,16 +161,16 @@ inline void read_distance(int16_t *distance){
 	int16_t avg = 0;
 
 	for(int i=0; i<DISTANCE_SAMPLING_NUM; i++){
-		pinMode(TRIG_PIN, OUTPUT);
-		digitalWrite(TRIG_PIN, LOW);
+		pinMode(trig_pin, OUTPUT);
+		digitalWrite(trig_pin, LOW);
 		delayMicroseconds(2);
-		digitalWrite(TRIG_PIN, HIGH);
+		digitalWrite(trig_pin, HIGH);
 		delayMicroseconds(10);
 
-		digitalWrite(TRIG_PIN, LOW);
+		digitalWrite(trig_pin, LOW);
 
-		pinMode(ECHO_PIN, INPUT);
-		duration=pulseIn(ECHO_PIN, HIGH);
+		pinMode(echo_pin, INPUT);
+		duration=pulseIn(echo_pin, HIGH);
 		cm=microsecondsToCentimeters(duration);
 		sum+=cm;
 		delay(35);
@@ -360,14 +207,6 @@ void setup(){
 		pinMode(MOTOR_PINS[pin], OUTPUT);
 	}
 
-	pinMode(RED_PIN, OUTPUT);
-	pinMode(YELLOW_PIN, OUTPUT);
-	pinMode(GREEN_PIN, OUTPUT);
-
-	digitalWrite(RED_PIN, LOW);
-	digitalWrite(YELLOW_PIN, LOW);
-	digitalWrite(GREEN_PIN, LOW);
-
 	Serial.begin(BAUD_RATE);
 }
 
@@ -378,16 +217,12 @@ void loop()
 	{
 		case MICROPHONE_REQUEST:
 			{
-				// int16_t intensity1;
-				// int16_t intensity2;
-				// int16_t intensity3;
-				//
-				// read_microphone_data(&intensity1, &intensity2, &intensity3);
-				// send_microphone_data(intensity1, intensity2, intensity3);
+				int16_t intensity1;
+				int16_t intensity2;
+				int16_t intensity3;
 
-				int16_t turn_angle;
-				read_microphone_turn_angle(&turn_angle);
-				send_microphone_turn_angle(turn_angle);
+				read_microphone_data(&intensity1, &intensity2, &intensity3);
+				send_microphone_data(intensity1, intensity2, intensity3);
 
 				break;
 			}

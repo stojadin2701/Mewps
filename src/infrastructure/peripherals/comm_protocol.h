@@ -23,6 +23,17 @@ inline int16_t receive_preamble()
     return serial_comm_receive();
 }
 
+inline void send_microphone_turn_angle(const int16_t turn_angle)
+{
+    serial_comm_send(turn_angle);
+}
+
+inline void request_microphone_turn_angle(int16_t* turn_angle)
+{
+    serial_comm_send(MICROPHONE_REQUEST);
+    *turn_angle = serial_comm_receive();
+}
+
 inline void send_microphone_data(const int16_t intensity1, const int16_t intensity2, const int16_t intensity3)
 {
     serial_comm_send(intensity1);
