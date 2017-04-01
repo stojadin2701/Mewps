@@ -237,7 +237,6 @@ int main(){
 	thread dis_thread(distance_thread);
 	try{
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
-			int16_t f1, f2, f3;
 			int16_t turn_angle;
 			sleep_for(milliseconds(2000));
 			unique_lock<mutex> lock_complete(complete);
@@ -249,7 +248,7 @@ int main(){
 			}
 			cout<<"LISTENING ("<< k+1 << ")" << endl;
 			Microphones::get_turn_angle(&turn_angle);
-			cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
+			cout<<"TURNING "+turn_angle<<endl;		
 			sound_direction = calculate_direction(turn_angle);
 			switch(sound_direction){
 				case NORTH:
