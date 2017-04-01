@@ -35,7 +35,7 @@ using std::atomic;
 #define DISTANCE_THRESHOLD 20
 #define LISTENING_NUM 10
 
-#define TURN_DURATION 700
+#define TURN_DURATION 1000
 
 atomic<bool> program_terminated(false);
 //Indicates whether both motors are going forward
@@ -52,10 +52,10 @@ atomic<int> recovery_counter(0);
 
 bool kill = false;
 
-enum Direction { NORTH, SOUTH, EAST, WEST, NORTH_WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NONE };
+enum Direction { FRONT, RIGHT, LEFT, FRONT_SHORT, NONE };
 
 Direction sound_direction = NONE;
-/*
+
 Direction calculate_direction(int16_t i1, int16_t i2, int16_t i3) {
 	Direction dir = NONE;
 	int16_t eps = 2;
@@ -68,24 +68,6 @@ Direction calculate_direction(int16_t i1, int16_t i2, int16_t i3) {
 	else if((i2+eps)<= i1 && (i2+eps)<=i3) dir = FRONT_SHORT;
 	else if((i3+eps)<= i1 && (i3+eps)<=i2) dir = FRONT_SHORT;
 
-	return dir;
-}
-*/
-
-Direction calculate_direction(int16_t turn_angle) {
-	Direction dir = NONE;
-
-	switch (turn_angle) {
-		case 0: dir = NORTH; break;
-		case 45: dir = NORTH_EAST; break;
-		case 90: dir = EAST; break;
-		case 135: dir = SOUTH_EAST; break;
-		case 180: dir = SOUTH; break;
-		case -180: dir = SOUTH; break;
-		case -135: dir = SOUTH_WEST; break;
-		case -90: dir = WEST; break;
-		case -45: dir = NORTH_WEST; break;
-	}
 	return dir;
 }
 
@@ -121,34 +103,6 @@ void go_forward(int16_t duration){
 	}
 	going_forward.store(false);
 }
-
-void go_north(int16_t duration){
-	going_forward.store(true);
-	cout<<"GOING NORTH"<<endl;
-	Motors::set_powers(0.45, 0.45);
-	sleep_for(milliseconds(duration));
-	if(going_forward.load()){
-		cout<<"SUCCESSFULLY FINISHED FORWARD MOVEMENT"<<endl;
-		Motors::set_powers(0, 0);
-	}
-	going_forward.store(false);
-}
-
-void turn_east(int16_t duration){
-	cout<<"TURNING EAST"<<endl;
-	Motors::set_powers(0.75, -0.8);
-	sleep_for(milliseconds(duration));
-	Motors::set_powers(0, 0);
-}
-
-void turn_west(int16_t duration){
-	cout<<"TURNING WEST"<<endl;
-	Motors::set_powers(-0.8, 0.75);
-	sleep_for(milliseconds(duration));
-	Motors::set_powers(0,0);
-}
-
-
 
 void play_death_song(){
 	Speaker::play_sound(1500, 1000);
@@ -237,7 +191,7 @@ int main(){
 	thread dis_thread(distance_thread);
 	try{
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
-			int16_t turn_angle;
+			int16_t f1, f2, f3;
 			sleep_for(milliseconds(2000));
 			unique_lock<mutex> lock_complete(complete);
 			cv.wait(lock_complete, []{return ready.load();});
@@ -247,72 +201,46 @@ int main(){
 				break;
 			}
 			cout<<"LISTENING ("<< k+1 << ")" << endl;
-			Microphones::get_turn_angle(&turn_angle);
-			cout<<"TURNING "<<turn_angle<<endl;
-			sound_direction = calculate_direction(turn_angle);
+			Microphones::get_intensities(&f1, &f2, &f3);
+			cout << "Front: " << f1 << " Right: " << f2 << " Left: "<< f3 << endl;
+			sound_direction = calculate_direction(f1, f2, f3);
 			switch(sound_direction){
-				case NORTH:
-					go_north(1400);
-				 	break;
-				case NORTH_EAST:
-					turn_east(TURN_DURATION/2);
+				case FRONT:
+					cout<<"HEARING FRONT"<<endl;
+					/*
+					Speaker::play_sound(2000, 100);
+					sleep_for(milliseconds(140));
+					Speaker::play_sound(2000, 100);
+					sleep_for(milliseconds(140));
+					Speaker::play_sound(2000, 100);
+					*/
+					go_forward(1400);
 					break;
-				case EAST:
-					turn_east(TURN_DURATION);
+				case RIGHT:
+					cout<<"HEARING RIGHT"<<endl;
+					/*
+					Speaker::play_sound(1000, 250);
+					sleep_for(milliseconds(280));
+					Speaker::play_sound(1000, 250);
+					*/
+					turn_right(TURN_DURATION);
 					break;
-				case SOUTH_EAST:
-					turn_east(3*TURN_DURATION/2);
+				case LEFT:
+					cout<<"HEARING LEFT"<<endl;
+					/*
+					Speaker::play_sound(500, 500);
+					*/
+					turn_left(TURN_DURATION);
 					break;
-				case SOUTH:
-				 	turn_east(2*TURN_DURATION);
-					break;
-				case SOUTH_WEST:
-					turn_west(3*TURN_DURATION/2);
-				 	break;
-				case WEST:
-					turn_west(TURN_DURATION);
-					break;
-				case NORTH_WEST:
-					turn_west(TURN_DURATION/2);
+				case FRONT_SHORT:
+					cout<<"HEARING FRONT_SHORT"<<endl;
+					go_forward(750);
 					break;
 				case NONE:
 					cout << "DIRECTION NOT DETERMINED :\'(" << endl;
 					Speaker::play_sound(300, 1500);
 					sleep_for(milliseconds(500));
 					break;
-
-				//case FRONT:
-					//cout<<"HEARING FRONT"<<endl;
-					/*
-					Speaker::play_sound(2000, 100);
-					sleep_for(milliseconds(140));
-					Speaker::play_sound(2000, 100);
-					sleep_for(milliseconds(140));
-					Speaker::play_sound(2000, 100);
-					*/
-					//go_forward(1400);
-					//break;
-				//case RIGHT:
-					//cout<<"HEARING RIGHT"<<endl;
-					/*
-					Speaker::play_sound(1000, 250);
-					sleep_for(milliseconds(280));
-					Speaker::play_sound(1000, 250);
-					*/
-					//turn_right(TURN_DURATION);
-					//break;
-				//case LEFT:
-					//cout<<"HEARING LEFT"<<endl;
-					/*
-					Speaker::play_sound(500, 500);
-					*/
-					//turn_left(TURN_DURATION);
-					//break;
-				//case FRONT_SHORT:
-					//cout<<"HEARING FRONT_SHORT"<<endl;
-					//go_forward(750);
-					//break;
-
 			}
 		}
 		listening_ended.store(true);

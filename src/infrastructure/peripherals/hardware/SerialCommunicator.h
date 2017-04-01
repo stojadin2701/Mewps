@@ -20,7 +20,7 @@ class SerialCommunicator
 
 public:
 
-	static constexpr int TIMEOUT_PERIOD = 20; //tenths of a second
+	static constexpr int TIMEOUT_PERIOD = 2000; //tenths of a second
 
 	static void send(const uint16_t msg);
 	static uint16_t receive();

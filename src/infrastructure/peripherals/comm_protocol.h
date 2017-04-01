@@ -9,12 +9,6 @@
 
 #include "hardware/serial_comm.h"
 
-#include <thread>
-using std::thread;
-#include <chrono>
-using std::this_thread::sleep_for;
-using std::chrono::milliseconds;
-
 // Unique preambles to identify message type
 const int16_t MICROPHONE_REQUEST = 0;
 const int16_t MOTORS_COMMAND = 1;
@@ -37,7 +31,6 @@ inline void send_microphone_turn_angle(const int16_t turn_angle)
 inline void request_microphone_turn_angle(int16_t* turn_angle)
 {
     serial_comm_send(MICROPHONE_REQUEST);
-    sleep_for(milliseconds(20000));
     *turn_angle = serial_comm_receive();
 }
 
