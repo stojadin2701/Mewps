@@ -234,7 +234,7 @@ void distance_thread(){
 int main(){
 	sleep_for(milliseconds(2000));
 	cout << "STARTING..." << endl;
-	//thread dis_thread(distance_thread);
+	thread dis_thread(distance_thread);
 	try{
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
 			int16_t turn_angle;
@@ -316,7 +316,7 @@ int main(){
 			}
 		}
 		listening_ended.store(true);
-		//dis_thread.join();
+		dis_thread.join();
 		Motors::set_powers(0,0);
 		play_death_song();
 		cout<<"SHUTTING DOWN..."<<endl;
