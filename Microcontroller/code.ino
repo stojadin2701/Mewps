@@ -219,8 +219,6 @@ inline void read_microphone_turn_angle(int16_t *turn_angle) {
 	      unsigned long delays[3] = {t0, t1, t2};
 	      float turn_angle = determine_angle(delays);
 
-	      char print_str[60];
-
 	      if (isnan(turn_angle))
 	      {
 	        i--;
@@ -240,7 +238,7 @@ inline void read_microphone_turn_angle(int16_t *turn_angle) {
 	      delay(200);
 	  }
 
-	  float diffs[3], min_diff, max_diff;
+	  float diffs[3];
 
 	  diffs[0] = fabs(angles[0] - angles[1]);
 	  diffs[1] = fabs(angles[1] - angles[2]);
