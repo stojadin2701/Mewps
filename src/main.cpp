@@ -234,7 +234,7 @@ void distance_thread(){
 	}
 }
 
-void get_magnetic_field(){
+void get_magnetic_xyz(){
 	float mag_x, mag_y, mag_z;
 	Magnetometer::get_magnetic_field(&mag_x, &mag_y, &mag_z);
 	cout<<"X: "<<mag_x<<endl;
@@ -257,7 +257,7 @@ int main(){
 				cout<<"GOODBYE CRUEL WORLD!"<<endl;
 				break;
 			}
-			get_magnetic_field();
+			get_magnetic_xyz();
 			cout<<"LISTENING ("<< k+1 << ")" << endl;
 			Microphones::get_turn_angle(&turn_angle);
 			cout<<"TURNING "<<turn_angle<<endl;
