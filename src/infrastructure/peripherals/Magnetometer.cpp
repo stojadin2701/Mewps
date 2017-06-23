@@ -11,7 +11,7 @@
 namespace infrastructure
 {
 
-void Magnetometer::get_magnetic_field(float* mx, float *my, float *mz)
+void Magnetometer::get_magnetic_field(float* mx, float* my, float* mz)
 {
 	int16_t int_mx, int_my, int_mz;
 

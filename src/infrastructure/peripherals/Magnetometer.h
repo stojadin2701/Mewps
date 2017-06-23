@@ -15,7 +15,7 @@ class Magnetometer
 
 public:
 
-    static void get_magnetic_field(float* mx, float *my, float *mz);
+    static void get_magnetic_field(float* mx, float* my, float* mz);
 
 private:
 
