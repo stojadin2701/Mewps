@@ -1,5 +1,6 @@
 #include <math.h>
 #include <limits.h>
+#include <Wire.h>
 #include "../src/infrastructure/peripherals/hardware/serial_comm.h"
 #include "../src/infrastructure/peripherals/comm_protocol.h"
 
