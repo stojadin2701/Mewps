@@ -99,6 +99,20 @@ public:
 	    receive_sound_data(frequency, duration);
 	}
 
+	static void request_magnetometer_data_ts(int16_t *mx, int16_t *my, int16_t *mz)
+	{
+		unique_lock<mutex> lock(threadsafety);
+
+	    request_magnetometer_data(mx, my, mz);
+	}
+
+	static void send_magnetometer_data_ts(const int16_t mx, const int16_t my, const int16_t mz)
+	{
+	    unique_lock<mutex> lock(threadsafety);
+
+	    send_magnetometer_data(mx, my, mz);
+	}
+
 	static void request_accelerometer_data_ts(int16_t *ax, int16_t *ay, int16_t *az)
 	{
 		unique_lock<mutex> lock(threadsafety);

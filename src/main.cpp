@@ -11,6 +11,9 @@ using infrastructure::Motors;
 #include "infrastructure/peripherals/Speaker.h"
 using infrastructure::Speaker;
 
+#include "infrastructure/peripherals/Magnetometer.h"
+using infrastructure::Magnetometer;
+
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -231,10 +234,18 @@ void distance_thread(){
 	}
 }
 
+void get_magnetic_field(){
+	float mag_x, mag_y, mag_z;
+	Magnetometer::get_magnetic_field(&mag_x, &mag_y, &mag_z);
+	cout<<"X: "<<mag_x<<endl;
+	cout<<"Y: "<<mag_y<<endl;
+	cout<<"Z: "<<mag_z<<endl;
+}
+
 int main(){
 	sleep_for(milliseconds(2000));
 	cout << "STARTING..." << endl;
-	thread dis_thread(distance_thread);
+	//thread dis_thread(distance_thread);
 	try{
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
 			int16_t turn_angle;
@@ -246,6 +257,7 @@ int main(){
 				cout<<"GOODBYE CRUEL WORLD!"<<endl;
 				break;
 			}
+			get_magnetic_field();
 			cout<<"LISTENING ("<< k+1 << ")" << endl;
 			Microphones::get_turn_angle(&turn_angle);
 			cout<<"TURNING "<<turn_angle<<endl;
@@ -316,7 +328,7 @@ int main(){
 			}
 		}
 		listening_ended.store(true);
-		dis_thread.join();
+		//dis_thread.join();
 		Motors::set_powers(0,0);
 		play_death_song();
 		cout<<"SHUTTING DOWN..."<<endl;

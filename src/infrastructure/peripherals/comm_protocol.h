@@ -16,6 +16,7 @@ const int16_t DISTANCE_REQUEST = 2;
 const int16_t PLAY_SOUND = 3;
 const int16_t ACCELEROMETER_REQUEST = 4;
 const int16_t POWER_STATUS_REQUEST = 5;
+const int16_t MAGNETOMETER_REQUEST = 6;
 
 // Protocol wrappers
 inline int16_t receive_preamble()
@@ -84,6 +85,22 @@ inline void receive_sound_data(int16_t* frequency, int16_t* duration){
   *frequency = serial_comm_receive();
   *duration = serial_comm_receive();
 }
+
+inline void request_magnetometer_data(int16_t *mx, int16_t *my, int16_t *mz)
+{
+    serial_comm_send(MAGNETOMETER_REQUEST);
+    *mx = serial_comm_receive();
+    *my = serial_comm_receive();
+    *mz = serial_comm_receive();
+}
+
+inline void send_magnetometer_data(const int16_t mx, const int16_t my, const int16_t mz)
+{
+    serial_comm_send(mx);
+    serial_comm_send(my);
+    serial_comm_send(mz);
+}
+
 
 inline void request_accelerometer_data(int16_t *ax, int16_t *ay, int16_t *az)
 {

@@ -9,6 +9,9 @@
 //Sample window width in mS
 #define SAMPLING_WINDOW 50
 
+//MAG
+#define MAG_ADDR  0x0E
+
 //Motor enable pins
 const unsigned ENABLE_PINS[] = { 4, 8 };
 //Left and right motor pins respectively
@@ -346,6 +349,47 @@ inline void read_power_status(int16_t *status){
 	*status = 0;
 }
 
+inline void read_accelerometer_data(int16_t *mx, int16_t *my, int16_t *mz){
+	*mx = read16Data(0x01,0x02);
+	*my = read16Data(0x03,0x04);
+	*mz = read16Data(0x05,0x06);  
+}
+
+int16_t read16Data(byte MSB, byte LSB)
+{
+  int16_t xl, xh;  
+  
+  Wire.beginTransmission(MAG_ADDR); 
+  Wire.write(MSB);              
+  Wire.endTransmission();       
+ 
+  delayMicroseconds(2); 
+  
+  Wire.requestFrom(MAG_ADDR, 1); 
+  while(Wire.available()){ 
+    xh = Wire.read(); 
+  }
+  
+  delayMicroseconds(2); 
+  
+  Wire.beginTransmission(MAG_ADDR); 
+  Wire.write(LSB);              
+  Wire.endTransmission();       
+ 
+  delayMicroseconds(2); 
+  
+  Wire.requestFrom(MAG_ADDR, 1); 
+  while(Wire.available()){ 
+    xl = Wire.read();
+  }
+  
+  int out = (xl|(xh << 8));
+  if (out & 0b1000000000000000){
+    return float ((~out & 0b0111111111111111)+ 1)*(-1) ;
+  }
+  return float (out);
+}
+
 void setup(){
 	unsigned pin;
 
@@ -365,6 +409,18 @@ void setup(){
 	digitalWrite(RED_PIN, LOW);
 	digitalWrite(YELLOW_PIN, LOW);
 	digitalWrite(GREEN_PIN, LOW);
+
+	Wire.beginTransmission(MAG_ADDR);
+    Wire.write(0x11);              
+    Wire.write(0x80);              
+    Wire.endTransmission();       
+  
+    delay(15);
+  
+    Wire.beginTransmission(MAG_ADDR);
+    Wire.write(0x10);              
+    Wire.write(1);                 
+    Wire.endTransmission();
 
 	Serial.begin(BAUD_RATE);
 }
@@ -429,6 +485,17 @@ void loop()
 
 				break;
 			}
+		case MAGNETOMETER_REQUEST:
+			{
+				int16_t mx;
+				int16_t my;
+				int16_t mz;
+
+				read_magnetometer_data(&mx, &my, &mz);
+				send_magnetometer_data(mx, my, mz);
+
+				break;
+			}	
 		case POWER_STATUS_REQUEST:
 			{
 				int16_t status;
