@@ -350,12 +350,6 @@ inline void read_power_status(int16_t *status){
 	*status = 0;
 }
 
-inline void read_magnetometer_data(int16_t *mx, int16_t *my, int16_t *mz){
-	*mx = read16Data(0x01,0x02);
-	*my = read16Data(0x03,0x04);
-	*mz = read16Data(0x05,0x06);  
-}
-
 int16_t read16Data(byte MSB, byte LSB)
 {
   int16_t xl, xh;  
@@ -390,6 +384,14 @@ int16_t read16Data(byte MSB, byte LSB)
   }
   return float (out);
 }
+
+inline void read_magnetometer_data(int16_t *mx, int16_t *my, int16_t *mz){
+	*mx = read16Data(0x01,0x02);
+	*my = read16Data(0x03,0x04);
+	*mz = read16Data(0x05,0x06);  
+}
+
+
 
 void setup(){
 	unsigned pin;
