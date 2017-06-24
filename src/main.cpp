@@ -55,6 +55,8 @@ atomic<int> recovery_counter(0);
 
 bool kill = false;
 
+float offset_x, float offset_y, float scale_x, float scale_y;
+
 enum Direction { NORTH, SOUTH, EAST, WEST, NORTH_WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NONE };
 
 Direction sound_direction = NONE;
@@ -240,6 +242,8 @@ void get_magnetic_xyz(){
 	cout<<"X: "<<mag_x<<endl;
 	cout<<"Y: "<<mag_y<<endl;
 	cout<<"Z: "<<mag_z<<endl;
+
+	cout<<"Compass: "<<(atan2(-(mag_y + offset_y)*scale_y, (mag_x + offset_x)*scale_x) * (180.0/3.14159265358979))<<endl;
 }
 
 int main(){
@@ -247,6 +251,8 @@ int main(){
 	cout << "STARTING..." << endl;
 	//thread dis_thread(distance_thread);
 	try{
+		turn_east(6000);		
+		Magnetometer::get_offsets_scale_magnetic_field(&offset_x, &offset_y, &scale_x, &scale_y);
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
 			int16_t turn_angle;
 			sleep_for(milliseconds(2000));

@@ -113,6 +113,20 @@ public:
 	    send_magnetometer_data(mx, my, mz);
 	}
 
+	static void request_magnetometer_min_max_ts(int16_t *int_max_x, int16_t *int_min_x, int16_t *int_max_y, int16_t *int_min_y)
+	{
+		unique_lock<mutex> lock(threadsafety);
+
+	    request_magnetometer_min_max(int_max_x, int_min_x, int_max_y, int_min_y);
+	}
+
+	static void send_magnetometer_min_max_ts(const int16_t int_max_x, const int16_t int_min_x, const int16_t int_max_y, const int16_t int_min_y)
+	{
+	    unique_lock<mutex> lock(threadsafety);
+
+	    send_magnetometer_min_max(int_max_x, int_min_x, int_max_y, int_min_y);
+	}
+
 	static void request_accelerometer_data_ts(int16_t *ax, int16_t *ay, int16_t *az)
 	{
 		unique_lock<mutex> lock(threadsafety);

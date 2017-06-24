@@ -358,20 +358,20 @@ int16_t read16Data(byte MSB, byte LSB)
   Wire.write(MSB);              
   Wire.endTransmission();       
  
-  delayMicroseconds(2); 
+  delay(200); 
   
   Wire.requestFrom(MAG_ADDR, 1); 
   while(Wire.available()){ 
     xh = Wire.read(); 
   }
   
-  delayMicroseconds(2); 
+  delay(200); 
   
   Wire.beginTransmission(MAG_ADDR); 
   Wire.write(LSB);              
   Wire.endTransmission();       
  
-  delayMicroseconds(2); 
+  delay(200); 
   
   Wire.requestFrom(MAG_ADDR, 1); 
   while(Wire.available()){ 
@@ -391,7 +391,52 @@ inline void read_magnetometer_data(int16_t *mx, int16_t *my, int16_t *mz){
 	*mz = read16Data(0x05,0x06);  
 }
 
+read_magnetometer_min_max(int16_t *max_x, int16_t *min_x, int16_t *max_y, int16_t *min_y){
+	
+	*min_x = 32767;
+	*max_x = 0x8000;
 
+	*min_y = 32767;
+	*max_y = 0x8000;
+
+	int16_t x, y;
+	bool calibrated = false;
+
+	while(!calibrated){
+
+		x = read16Data(0x01,0x02);
+		y = read16Data(0x03,0x04);
+		
+		bool changed = false;
+		if(x < *min_x)
+	    {
+	      *min_x = x;
+	      changed = true;
+	    }
+	    if(x > *max_x) 
+	    {
+	      *max_x = x;
+	      changed = true;
+	    }
+	    if(y < *min_y) 
+	    {
+	      *min_y = y;
+	      changed = true;
+	    }
+	    if(y > *max_y) 
+	    {
+	      *max_y = y;
+	      changed = true;
+	    }
+		
+		if(changed)
+	     timeLastChange = millis(); //Reset timeout counter
+
+	    if(millis() > 5000 && millis() - timeLastChange > 5000) 
+	    	calibrated = true;
+    }	
+
+}
 
 void setup(){
 	unsigned pin;
@@ -498,7 +543,19 @@ void loop()
 				send_magnetometer_data(mx, my, mz);
 
 				break;
-			}	
+			}
+		case MAGNETOMETER_CAL_REQUEST:
+			{
+				int16_t max_x;
+				int16_t min_x;
+				int16_t max_y;
+				int16_t min_y;
+
+				read_magnetometer_min_max(&max_x, &min_x, &max_y, &min_y);
+				send_magnetometer_min_max(max_x, min_x, max_y, min_y);
+
+				break;
+			}		
 		case POWER_STATUS_REQUEST:
 			{
 				int16_t status;

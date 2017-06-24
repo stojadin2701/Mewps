@@ -22,4 +22,18 @@ void Magnetometer::get_magnetic_field(float* mx, float* my, float* mz)
     *mz = CONVERSION_FACTOR*int_mz; //uT
 }
 
+void get_offsets_scale_magnetic_field(float* offset_x, float* offset_y, float* scale_x, float* scale_y)
+{
+	int16_t int_max_x, int_min_x, int_max_y, int_min_y;
+
+	CommProtocolThreadsafe::request_magnetometer_min_max_ts(&int_max_x, &int_min_x, &int_max_y, &int_min_y);
+
+	*offset_x = ((float)(int_min_x + int_max_x))/2.0;
+	*offset_y = ((float)(int_min_y + int_max_y))/2;
+
+	*scale_x = 1.0/(float)(int_max_x - int_min_x);
+	*scale_y = 1.0/(float)(int_max_y - int_min_y);
+
+}
+
 }  /* namespace infrastructure */

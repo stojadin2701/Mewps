@@ -17,6 +17,7 @@ const int16_t PLAY_SOUND = 3;
 const int16_t ACCELEROMETER_REQUEST = 4;
 const int16_t POWER_STATUS_REQUEST = 5;
 const int16_t MAGNETOMETER_REQUEST = 6;
+const int16_t MAGNETOMETER_CAL_REQUEST = 7;
 
 // Protocol wrappers
 inline int16_t receive_preamble()
@@ -100,6 +101,24 @@ inline void send_magnetometer_data(const int16_t mx, const int16_t my, const int
     serial_comm_send(my);
     serial_comm_send(mz);
 }
+
+inline void request_magnetometer_min_max(int16_t *int_max_x, int16_t *int_min_x, int16_t *int_max_y, int16_t *int_min_y)
+{
+    serial_comm_send(MAGNETOMETER_CAL_REQUEST);
+    *int_max_x = serial_comm_receive();
+    *int_min_x = serial_comm_receive();
+    *int_max_y = serial_comm_receive();   
+    *int_min_y = serial_comm_receive();    
+}
+
+inline void send_magnetometer_min_max(const int16_t int_max_x, const int16_t int_min_x, const int16_t int_max_y, const int16_t int_min_y)
+{
+    serial_comm_send(int_max_x);
+    serial_comm_send(int_min_x);
+    serial_comm_send(int_max_y);
+    serial_comm_send(int_min_y);
+}
+
 
 
 inline void request_accelerometer_data(int16_t *ax, int16_t *ay, int16_t *az)
