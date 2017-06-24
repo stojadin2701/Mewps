@@ -35,6 +35,8 @@ using std::unique_lock;
 using std::condition_variable;
 using std::atomic;
 
+#include <math.h>
+
 #define DISTANCE_THRESHOLD 20
 #define LISTENING_NUM 10
 
@@ -243,7 +245,7 @@ void get_magnetic_xyz(){
 	cout<<"Y: "<<mag_y<<endl;
 	cout<<"Z: "<<mag_z<<endl;
 
-	cout<<"Compass: "<<(atan2(-(mag_y + offset_y)*scale_y, (mag_x + offset_x)*scale_x) * (180.0/3.14159265358979))<<endl;
+	cout<<"Compass: "<<(atan2(-(mag_y + offset_y)*scale_y , (mag_x + offset_x)*scale_x) * (180.0/3.14159265358979))<<endl;
 }
 
 int main(){
