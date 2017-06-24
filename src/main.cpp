@@ -148,6 +148,13 @@ void turn_east(int16_t duration){
 	Motors::set_powers(0, 0);
 }
 
+void calibrate(){
+	cout<<"CALIBRATING"<<endl;
+	Motors::set_powers(0.75, -0.8);
+	Magnetometer::get_magnetic_field_info(&offset_x, &offset_y, &scale_x, &scale_y);
+	Motors::set_powers(0, 0);
+}
+
 void turn_west(int16_t duration){
 	cout<<"TURNING WEST"<<endl;
 	Motors::set_powers(-0.8, 0.75);
@@ -253,9 +260,7 @@ int main(){
 	cout << "STARTING..." << endl;
 	//thread dis_thread(distance_thread);
 	try{
-		turn_east(6000);	
-
-		Magnetometer::get_magnetic_field_info(&offset_x, &offset_y, &scale_x, &scale_y);
+		calibrate();
 
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
 			int16_t turn_angle;
