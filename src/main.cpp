@@ -253,8 +253,10 @@ int main(){
 	cout << "STARTING..." << endl;
 	//thread dis_thread(distance_thread);
 	try{
-		turn_east(6000);		
-		Magnetometer::get_offsets_scale_magnetic_field(&offset_x, &offset_y, &scale_x, &scale_y);
+		turn_east(6000);	
+
+		Magnetometer::get_magnetic_field_info(&offset_x, &offset_y, &scale_x, &scale_y);
+
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
 			int16_t turn_angle;
 			sleep_for(milliseconds(2000));

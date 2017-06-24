@@ -22,7 +22,7 @@ void Magnetometer::get_magnetic_field(float* mx, float* my, float* mz)
     *mz = CONVERSION_FACTOR*int_mz; //uT
 }
 
-void get_offsets_scale_magnetic_field(float* offset_x, float* offset_y, float* scale_x, float* scale_y)
+void get_magnetic_field_info(float* offset_x, float* offset_y, float* scale_x, float* scale_y)
 {
 	int16_t int_max_x, int_min_x, int_max_y, int_min_y;
 
