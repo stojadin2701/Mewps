@@ -459,6 +459,7 @@ void setup(){
 	digitalWrite(YELLOW_PIN, LOW);
 	digitalWrite(GREEN_PIN, LOW);
 
+	Wire.begin();
 	Wire.beginTransmission(MAG_ADDR);
     Wire.write(0x11);              
     Wire.write(0x80);              
