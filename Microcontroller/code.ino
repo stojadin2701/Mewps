@@ -391,7 +391,7 @@ inline void read_magnetometer_data(int16_t *mx, int16_t *my, int16_t *mz){
 	*mz = read16Data(0x05,0x06);  
 }
 
-read_magnetometer_min_max(int16_t *max_x, int16_t *min_x, int16_t *max_y, int16_t *min_y){
+inline void read_magnetometer_min_max(int16_t *max_x, int16_t *min_x, int16_t *max_y, int16_t *min_y){
 	
 	*min_x = 32767;
 	*max_x = 0x8000;
@@ -401,6 +401,7 @@ read_magnetometer_min_max(int16_t *max_x, int16_t *min_x, int16_t *max_y, int16_
 
 	int16_t x, y;
 	bool calibrated = false;
+	int timeLastChange;
 
 	while(!calibrated){
 

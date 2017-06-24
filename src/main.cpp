@@ -55,7 +55,7 @@ atomic<int> recovery_counter(0);
 
 bool kill = false;
 
-float offset_x, float offset_y, float scale_x, float scale_y;
+float offset_x, offset_y, scale_x, scale_y;
 
 enum Direction { NORTH, SOUTH, EAST, WEST, NORTH_WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NONE };
 
