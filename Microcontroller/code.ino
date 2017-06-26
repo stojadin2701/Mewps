@@ -482,12 +482,7 @@ void loop()
 	{
 		case MICROPHONE_REQUEST:
 			{
-				// int16_t intensity1;
-				// int16_t intensity2;
-				// int16_t intensity3;
-				//
-				// read_microphone_data(&intensity1, &intensity2, &intensity3);
-				// send_microphone_data(intensity1, intensity2, intensity3);
+				
 
 				int16_t turn_angle;
 				read_microphone_turn_angle(&turn_angle);

@@ -62,22 +62,7 @@ float offset_x, offset_y, scale_x, scale_y;
 enum Direction { NORTH, SOUTH, EAST, WEST, NORTH_WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST, NONE };
 
 Direction sound_direction = NONE;
-/*
-Direction calculate_direction(int16_t i1, int16_t i2, int16_t i3) {
-	Direction dir = NONE;
-	int16_t eps = 2;
-	int16_t threshold = 1;
 
-	if(i1 < threshold && i2 < threshold && i3 < threshold) dir=NONE;
-	else if((i1-eps)>= i2 && (i1-eps)>=i3) dir = FRONT;
-	else if((i2-eps)>= i1 && (i2-eps)>=i3) dir = RIGHT;
-	else if((i3-eps)>= i1 && (i3-eps)>=i2) dir = LEFT;
-	else if((i2+eps)<= i1 && (i2+eps)<=i3) dir = FRONT_SHORT;
-	else if((i3+eps)<= i1 && (i3+eps)<=i2) dir = FRONT_SHORT;
-
-	return dir;
-}
-*/
 
 Direction calculate_direction(int16_t turn_angle) {
 	Direction dir = NONE;
@@ -258,8 +243,9 @@ void get_magnetic_xyz(){
 int main(){
 	sleep_for(milliseconds(2000));
 	cout << "STARTING..." << endl;
-	//thread dis_thread(distance_thread);
+	thread dis_thread(distance_thread);
 	try{
+
 		calibrate();
 
 		for(int k=0; k < LISTENING_NUM && !program_terminated.load(); k++){
@@ -306,44 +292,12 @@ int main(){
 					cout << "DIRECTION NOT DETERMINED :\'(" << endl;
 					Speaker::play_sound(300, 1500);
 					sleep_for(milliseconds(500));
-					break;
-
-				//case FRONT:
-					//cout<<"HEARING FRONT"<<endl;
-					/*
-					Speaker::play_sound(2000, 100);
-					sleep_for(milliseconds(140));
-					Speaker::play_sound(2000, 100);
-					sleep_for(milliseconds(140));
-					Speaker::play_sound(2000, 100);
-					*/
-					//go_forward(1400);
-					//break;
-				//case RIGHT:
-					//cout<<"HEARING RIGHT"<<endl;
-					/*
-					Speaker::play_sound(1000, 250);
-					sleep_for(milliseconds(280));
-					Speaker::play_sound(1000, 250);
-					*/
-					//turn_right(TURN_DURATION);
-					//break;
-				//case LEFT:
-					//cout<<"HEARING LEFT"<<endl;
-					/*
-					Speaker::play_sound(500, 500);
-					*/
-					//turn_left(TURN_DURATION);
-					//break;
-				//case FRONT_SHORT:
-					//cout<<"HEARING FRONT_SHORT"<<endl;
-					//go_forward(750);
-					//break;
+					break;				
 
 			}
 		}
 		listening_ended.store(true);
-		//dis_thread.join();
+		dis_thread.join();
 		Motors::set_powers(0,0);
 		play_death_song();
 		cout<<"SHUTTING DOWN..."<<endl;
